@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: c6918cf8652c43e47a7258b3d12edff4
+timeCreated: 1436640888
+licenseType: Store
+ShaderImporter:
+  defaultTextures: []
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 34435
+  packageName: TENKOKU Dynamic Sky
+  packageVersion: 1.2.2
+  assetPath: Assets/TENKOKU - DYNAMIC SKY/SHADERS/Tenkoku_aurora_plane.shader
+  uploadId: 370217

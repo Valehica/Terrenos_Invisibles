@@ -1,0 +1,18 @@
+Copia de los assets tal como estaban antes del pase de invierno con sol
+(2026-09-20), porque ninguno de los cuatro esta en git.
+
+  FondoSur.asset         malla de fondo, anillos interiores sin hundir
+  TerrainHeight_Sur.asset heightmap bakeado que lee el shader del agua
+  OceanWaterSur.mat       oleaje viejo (4 trenes en 90 grados)
+  PostPro_Sur.asset       grading calibrado para cielo nublado
+
+Para volver atras, copiarlos sobre:
+  Assets/Meshes/FondoSur.asset
+  Assets/Textures/TerrainHeight_Sur.asset
+  Assets/Materials/OceanWaterSur.mat
+  Assets/Settings/PostPro_Sur.asset
+
+El heightmap del Terrain se revierte aparte, desde el menu
+Terrenos > Sur > Restaurar bordes del terreno.
+
+Se puede borrar esta carpeta entera una vez que el pase este aprobado.

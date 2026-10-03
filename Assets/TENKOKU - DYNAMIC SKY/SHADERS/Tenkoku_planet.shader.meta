@@ -1,0 +1,12 @@
+fileFormatVersion: 2
+guid: 8ef1e21c3f4a7a243a97671111c31a00
+ShaderImporter:
+  defaultTextures: []
+  userData: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 34435
+  packageName: TENKOKU Dynamic Sky
+  packageVersion: 1.2.2
+  assetPath: Assets/TENKOKU - DYNAMIC SKY/SHADERS/Tenkoku_planet.shader
+  uploadId: 370217

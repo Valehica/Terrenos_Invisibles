@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 2ddfd648d87c41741bfca0fa875ef44f
+timeCreated: 1439347675
+licenseType: Store
+ShaderImporter:
+  defaultTextures: []
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 34435
+  packageName: TENKOKU Dynamic Sky
+  packageVersion: 1.2.2
+  assetPath: Assets/TENKOKU - DYNAMIC SKY/SHADERS/TenkokuBlur.shader
+  uploadId: 370217

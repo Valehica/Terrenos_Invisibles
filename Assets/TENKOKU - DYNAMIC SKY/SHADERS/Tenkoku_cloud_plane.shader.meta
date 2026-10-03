@@ -1,0 +1,12 @@
+fileFormatVersion: 2
+guid: 334080db660fa8945b0e712aaf764148
+ShaderImporter:
+  defaultTextures: []
+  userData: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 34435
+  packageName: TENKOKU Dynamic Sky
+  packageVersion: 1.2.2
+  assetPath: Assets/TENKOKU - DYNAMIC SKY/SHADERS/Tenkoku_cloud_plane.shader
+  uploadId: 370217

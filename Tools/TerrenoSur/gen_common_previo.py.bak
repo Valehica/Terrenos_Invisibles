@@ -1,0 +1,175 @@
+import numpy as np, math, json, pickle, time
+N=3601
+LAT0=-49.126383; LON0=-74.415707
+M_LAT=111132.0; M_LON=111320.0*math.cos(math.radians(LAT0))
+# ---- scene frame: world = local - ORIGIN ----
+ORIGIN=(120.0,40.0)          # local metres mapped to Unity world (0,0)
+HALF=800.0                   # terrain half-size -> 1600 x 1600 m
+
+_T={}
+def _tile(la,lo):
+    k=(la,lo)
+    if k not in _T:
+        a=np.fromfile(f"S{abs(la):02d}W{abs(lo):03d}.hgt",dtype='>i2').reshape(N,N).astype(np.float32)
+        a[a<-1000]=0
+        _T[k]=a
+    return _T[k]
+
+def dem(lat,lon):
+    """vectorised bilinear DEM sample over the 4-tile mosaic"""
+    lat=np.asarray(lat,dtype=np.float64); lon=np.asarray(lon,dtype=np.float64)
+    out=np.zeros(lat.shape,dtype=np.float64)
+    la=np.floor(lat).astype(int); lo=np.floor(lon).astype(int)
+    for LA in (-50,-49):
+        for LO in (-75,-74):
+            m=(la==LA)&(lo==LO)
+            if not m.any(): continue
+            t=_tile(LA,LO)
+            r=(LA+1-lat[m])*(N-1); c=(lon[m]-LO)*(N-1)
+            r=np.clip(r,0,N-1.001); c=np.clip(c,0,N-1.001)
+            r0=r.astype(int); c0=c.astype(int); fr=r-r0; fc=c-c0
+            out[m]=(t[r0,c0]*(1-fr)*(1-fc)+t[r0+1,c0]*fr*(1-fc)
+                   +t[r0,c0+1]*(1-fr)*fc+t[r0+1,c0+1]*fr*fc)
+    return out
+
+def dem_xy(X,Y):
+    """X east / Y north in LOCAL metres"""
+    return dem(LAT0+np.asarray(Y)/M_LAT, LON0+np.asarray(X)/M_LON)
+
+# ---------- signed distance to the OSM coastline (land positive) ----------
+def simplify(pts,tol):
+    if len(pts)<3: return pts
+    st=[(0,len(pts)-1)]; keep=np.zeros(len(pts),bool); keep[0]=keep[-1]=True
+    P=np.asarray(pts)
+    while st:
+        i,j=st.pop()
+        if j<=i+1: continue
+        a=P[i]; b=P[j]; d=b-a; L=math.hypot(*d)
+        seg=P[i+1:j]
+        if L<1e-9: dist=np.hypot(seg[:,0]-a[0],seg[:,1]-a[1])
+        else: dist=np.abs(d[0]*(a[1]-seg[:,1])-d[1]*(a[0]-seg[:,0]))/L
+        k=int(np.argmax(dist))
+        if dist[k]>tol:
+            k+=i+1; keep[k]=True; st.append((i,k)); st.append((k,j))
+    return P[keep]
+
+def coast_segments(tol=4.0):
+    d=json.load(open('osm2.json'))
+    segs=[]
+    for e in d['elements']:
+        if e['type']!='way' or e.get('tags',{}).get('natural')!='coastline': continue
+        g=e.get('geometry') or []
+        if len(g)<2: continue
+        pts=[((p['lon']-LON0)*M_LON,(p['lat']-LAT0)*M_LAT) for p in g]
+        pts=simplify(pts,tol)
+        for i in range(len(pts)-1):
+            segs.append((pts[i][0],pts[i][1],pts[i+1][0],pts[i+1][1]))
+    return np.array(segs,dtype=np.float64)
+
+def sdf_grid(X,Y,S,block=48):
+    """signed distance, + on land (land lies left of way direction)"""
+    ny,nx=X.shape
+    out=np.zeros((ny,nx))
+    ax,ay,bx,by=S[:,0],S[:,1],S[:,2],S[:,3]
+    dx=bx-ax; dy=by-ay; L2=dx*dx+dy*dy; L2[L2==0]=1e-9
+    smnx=np.minimum(ax,bx); smxx=np.maximum(ax,bx)
+    smny=np.minimum(ay,by); smxy=np.maximum(ay,by)
+    MARGIN=900.0
+    for j0 in range(0,ny,block):
+        j1=min(j0+block,ny)
+        for i0 in range(0,nx,block):
+            i1=min(i0+block,nx)
+            px=X[j0:j1,i0:i1].ravel(); py=Y[j0:j1,i0:i1].ravel()
+            bx0,bx1=px.min()-MARGIN,px.max()+MARGIN
+            by0,by1=py.min()-MARGIN,py.max()+MARGIN
+            m=(smxx>=bx0)&(smnx<=bx1)&(smxy>=by0)&(smny<=by1)
+            if m.sum()<8: m=np.ones(len(S),bool)
+            iax,iay,idx,idy,iL2=ax[m],ay[m],dx[m],dy[m],L2[m]
+            t=np.clip(((px[:,None]-iax)*idx+(py[:,None]-iay)*idy)/iL2,0,1)
+            cx=iax+t*idx; cy=iay+t*idy
+            d2=(px[:,None]-cx)**2+(py[:,None]-cy)**2
+            k=np.argmin(d2,axis=1); r=np.arange(px.size)
+            dist=np.sqrt(d2[r,k])
+            cr=idx[k]*(py-iay[k])-idy[k]*(px-iax[k])
+            out[j0:j1,i0:i1]=np.where(cr>0,dist,-dist).reshape(j1-j0,i1-i0)
+    return out
+
+# ---------- value-noise fbm ----------
+def _vnoise(X,Y,cell,seed):
+    rng=np.random.default_rng(seed)
+    gx=np.floor(X/cell).astype(int); gy=np.floor(Y/cell).astype(int)
+    fx=X/cell-gx; fy=Y/cell-gy
+    ox,oy=gx.min(),gy.min()
+    G=rng.random((gy.max()-oy+2,gx.max()-ox+2))
+    gx-=ox; gy-=oy
+    u=fx*fx*(3-2*fx); v=fy*fy*(3-2*fy)
+    a=G[gy,gx]; b=G[gy,gx+1]; c=G[gy+1,gx]; d=G[gy+1,gx+1]
+    return (a*(1-u)+b*u)*(1-v)+(c*(1-u)+d*u)*v
+
+def fbm(X,Y,cell,octaves=5,gain=0.5,lac=2.0,seed=7):
+    t=np.zeros(X.shape); amp=1.0; tot=0.0; c=cell
+    for o in range(octaves):
+        t+=amp*_vnoise(X,Y,c,seed+o*131); tot+=amp; amp*=gain; c/=lac
+    return t/tot
+
+def blur(A,px,passes=3):
+    """separable box blur, radius px, repeated"""
+    px=max(1,int(px))
+    B=A.astype(np.float64)
+    for _ in range(passes):
+        k=np.ones(2*px+1)/(2*px+1)
+        B=np.apply_along_axis(lambda m:np.convolve(np.pad(m,px,mode='edge'),k,'valid'),1,B)
+        B=np.apply_along_axis(lambda m:np.convolve(np.pad(m,px,mode='edge'),k,'valid'),0,B)
+    return B
+
+# ---------- hundimiento del borde del Terrain ----------
+# El Terrain es un cuadrado de 1600 m y la tierra llegaba hasta el borde mismo:
+# desde dentro de la escena eso se ve como un tajo recto, porque ahi termina la
+# geometria detallada y empieza la malla de fondo, que es otra cosa. La franja
+# del perimetro se hunde bajo el nivel del mar para que la juntura quede debajo
+# del agua, donde no se ve. El ancho se modula con ruido; con un ancho constante
+# la costa nueva seria un rectangulo, que es otro tajo, solo que mas disimulado.
+W_BORDE = 150.0     # ancho medio de la franja, en metros
+D_BORDE = 28.0      # profundidad a la que queda el borde del cuadrado
+FUERA_BORDE = 1.7   # la malla de fondo tarda 1.7x mas en recuperar el relieve
+
+def _hash2(ix, iy, seed):
+    h = ix.astype(np.int64)*374761393 + iy.astype(np.int64)*668265263 + seed*1274126177
+    h = (h ^ (h >> 13))*1274126177
+    h = h & 0x7fffffff
+    return ((h ^ (h >> 16)) % 65536).astype(np.float64)/65536.0
+
+def _hnoise(x, y, cell, seed):
+    gx = np.floor(x/cell); gy = np.floor(y/cell)
+    fx = x/cell-gx; fy = y/cell-gy
+    ix = gx.astype(np.int64); iy = gy.astype(np.int64)
+    u = fx*fx*(3-2*fx); v = fy*fy*(3-2*fy)
+    a = _hash2(ix,iy,seed);   b = _hash2(ix+1,iy,seed)
+    c = _hash2(ix,iy+1,seed); d = _hash2(ix+1,iy+1,seed)
+    return (a*(1-u)+b*u)*(1-v)+(c*(1-u)+d*u)*v
+
+def ancho_borde(wx, wz, w0=None):
+    """Ancho local de la franja que se hunde. En coordenadas de MUNDO, para que
+    el Terrain y la malla de fondo usen el mismo ruido y la costa no se corte."""
+    w0 = W_BORDE if w0 is None else w0
+    n = 0.62*_hnoise(wx,wz,230.0,1771) + 0.38*_hnoise(wx,wz,85.0,1778)
+    return w0*(0.52+1.02*n)
+
+def _suave(t):
+    t = np.clip(t,0.0,1.0); return t*t*(3.0-2.0*t)
+
+def mascara_borde_terrain(wx, wz, w0=None):
+    """0 en el borde del cuadrado -> 1 tierra adentro."""
+    db = np.minimum(np.minimum(wx+HALF, HALF-wx), np.minimum(wz+HALF, HALF-wz))
+    return _suave(db/ancho_borde(wx,wz,w0))
+
+def mascara_borde_fondo(wx, wz, w0=None):
+    """0 en el borde del cuadrado -> 1 mar afuera, sobre la malla polar."""
+    r = np.hypot(wx,wz); th = np.arctan2(wz,wx)
+    r0 = HALF/np.maximum(np.abs(np.cos(th)),np.abs(np.sin(th)))
+    return _suave((r-r0)/(ancho_borde(wx,wz,w0)*FUERA_BORDE))
+
+def hundir_borde(H, t, d=None):
+    """Nunca levanta el fondo: solo baja lo que este por encima del objetivo."""
+    d = D_BORDE if d is None else d
+    return np.minimum(H, t*H + (1.0-t)*(-d))

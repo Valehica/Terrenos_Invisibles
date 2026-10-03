@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: aedaf62d9b35c3848abe26ad8ae5d779
+timeCreated: 1430600385
+licenseType: Store
+ShaderImporter:
+  defaultTextures: []
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 34435
+  packageName: TENKOKU Dynamic Sky
+  packageVersion: 1.2.2
+  assetPath: Assets/TENKOKU - DYNAMIC SKY/SHADERS/Tenkoku_FX_Fog.shader
+  uploadId: 370217

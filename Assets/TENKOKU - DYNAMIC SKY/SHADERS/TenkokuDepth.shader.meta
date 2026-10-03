@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: cda936bdae8713046adaf2cabe16f236
+timeCreated: 1439391109
+licenseType: Store
+ShaderImporter:
+  defaultTextures: []
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 34435
+  packageName: TENKOKU Dynamic Sky
+  packageVersion: 1.2.2
+  assetPath: Assets/TENKOKU - DYNAMIC SKY/SHADERS/TenkokuDepth.shader
+  uploadId: 370217

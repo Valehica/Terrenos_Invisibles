@@ -1,0 +1,19 @@
+fileFormatVersion: 2
+guid: 55534a2ab09eefa4fb91478e82f59636
+timeCreated: 1461646251
+licenseType: Store
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 34435
+  packageName: TENKOKU Dynamic Sky
+  packageVersion: 1.2.2
+  assetPath: Assets/TENKOKU - DYNAMIC SKY/_DEMO/SCRIPTS/ui_devFPS.cs
+  uploadId: 370217

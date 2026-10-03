@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 1a99aaf3b9544b14893c580821341403
+timeCreated: 1476992653
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 34435
+  packageName: TENKOKU Dynamic Sky
+  packageVersion: 1.2.2
+  assetPath: Assets/TENKOKU - DYNAMIC SKY/TEXTURES/renderTex_sky.renderTexture
+  uploadId: 370217

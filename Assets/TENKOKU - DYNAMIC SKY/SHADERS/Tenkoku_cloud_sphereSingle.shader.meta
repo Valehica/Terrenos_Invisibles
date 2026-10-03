@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 647c85507319fc7479bca53f3f8f6576
+timeCreated: 1519003658
+licenseType: Store
+ShaderImporter:
+  defaultTextures: []
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 34435
+  packageName: TENKOKU Dynamic Sky
+  packageVersion: 1.2.2
+  assetPath: Assets/TENKOKU - DYNAMIC SKY/SHADERS/Tenkoku_cloud_sphereSingle.shader
+  uploadId: 370217

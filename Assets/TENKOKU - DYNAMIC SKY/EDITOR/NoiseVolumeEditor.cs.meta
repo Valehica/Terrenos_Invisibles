@@ -1,0 +1,19 @@
+fileFormatVersion: 2
+guid: 990d746f448d34ede87401bb1421a0b6
+timeCreated: 1462893327
+licenseType: Store
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 34435
+  packageName: TENKOKU Dynamic Sky
+  packageVersion: 1.2.2
+  assetPath: Assets/TENKOKU - DYNAMIC SKY/EDITOR/NoiseVolumeEditor.cs
+  uploadId: 370217

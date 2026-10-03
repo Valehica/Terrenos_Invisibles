@@ -1,0 +1,12 @@
+fileFormatVersion: 2
+guid: c03ecac9b3b95044ab1b74425e25a091
+ShaderImporter:
+  defaultTextures: []
+  userData: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 34435
+  packageName: TENKOKU Dynamic Sky
+  packageVersion: 1.2.2
+  assetPath: Assets/TENKOKU - DYNAMIC SKY/SHADERS/Tenkoku_star.shader
+  uploadId: 370217

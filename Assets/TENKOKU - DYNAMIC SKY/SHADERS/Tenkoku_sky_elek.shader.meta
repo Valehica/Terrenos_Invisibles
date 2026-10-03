@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 444a107cd7b6c6440b0da7888a278b72
+timeCreated: 1489792572
+licenseType: Store
+ShaderImporter:
+  defaultTextures: []
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 34435
+  packageName: TENKOKU Dynamic Sky
+  packageVersion: 1.2.2
+  assetPath: Assets/TENKOKU - DYNAMIC SKY/SHADERS/Tenkoku_sky_elek.shader
+  uploadId: 370217

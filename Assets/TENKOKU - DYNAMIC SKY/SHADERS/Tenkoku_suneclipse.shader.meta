@@ -1,0 +1,12 @@
+fileFormatVersion: 2
+guid: 63d41c767b8641743adb9a7b43bf3794
+ShaderImporter:
+  defaultTextures: []
+  userData: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 34435
+  packageName: TENKOKU Dynamic Sky
+  packageVersion: 1.2.2
+  assetPath: Assets/TENKOKU - DYNAMIC SKY/SHADERS/Tenkoku_suneclipse.shader
+  uploadId: 370217

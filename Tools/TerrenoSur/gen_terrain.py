@@ -1,0 +1,162 @@
+exec(open('gen_common.py').read())
+import numpy as np, pickle, time
+t0=time.time()
+RES=2049; ARES=2048          # 1.56 m por muestra, igual que con 1600 m y 1025
+BASE_Y=-90.0; RANGE_Y=420.0      # era 180: con 3.2 km y sin hundir el borde los cerros llegan a ~300 m
+EXAG=1.6
+
+def boxblur(A,r,passes=3):
+    B=A.astype(np.float64)
+    for _ in range(passes):
+        for ax in (0,1):
+            B=np.moveaxis(B,ax,0)
+            P=np.pad(B,((r+1,r),(0,0)),mode='edge'); C=np.cumsum(P,axis=0)
+            B=(C[2*r+1:]-C[:-(2*r+1)])/(2*r+1); B=np.moveaxis(B,0,ax)
+    return B
+def grid(res):
+    w=np.linspace(-HALF,HALF,res); WX,WZ=np.meshgrid(w,w)
+    return WX,WZ,WX+ORIGIN[0],WZ+ORIGIN[1]
+def ridged(X,Y,cell,oct,seed):
+    return 1.0-np.abs(2.0*fbm(X,Y,cell,oct,0.55,2.0,seed)-1.0)
+
+WX,WZ,LX,LY=grid(RES)
+S=coast_segments()
+print("sdf...",flush=True); d=sdf_grid(LX,LY,S); print("  %.0fs"%(time.time()-t0),flush=True)
+
+# ---- flat ground where the village actually is (OSM landuse=residential) ----
+polys=pickle.load(open('landcover.pkl','rb'))
+def raster(plist,X,Y):
+    M=np.zeros(X.shape,bool); xs=X[0]; ys=Y[:,0]; n=X.shape[1]
+    for pts in plist:
+        P=np.asarray(pts)
+        if len(P)<3: continue
+        if P[:,1].max()<ys.min() or P[:,1].min()>ys.max(): continue
+        if P[:,0].max()<xs.min() or P[:,0].min()>xs.max(): continue
+        ax,ay,bx,by=P[:-1,0],P[:-1,1],P[1:,0],P[1:,1]
+        for r in np.where((ys>=P[:,1].min())&(ys<=P[:,1].max()))[0]:
+            yy=ys[r]
+            m=((ay<=yy)&(by>yy))|((by<=yy)&(ay>yy))
+            if not m.any(): continue
+            xi=np.sort(ax[m]+(yy-ay[m])*(bx[m]-ax[m])/(by[m]-ay[m]))
+            ins=np.zeros(n,bool)
+            for k in range(0,len(xi)-1,2): ins|=(xs>=xi[k])&(xs<=xi[k+1])
+            M[r]^=ins
+    return M
+villa=boxblur(raster(polys.get('residential',[]),LX,LY).astype(float),22,2)
+villa=np.clip(villa*2.4,0,1)
+print("  villa coverage %.3f"%(villa>0.5).mean(),flush=True)
+
+demv=dem_xy(LX,LY)
+macro=boxblur(np.maximum(demv-9.0,0.0),8)
+
+# ---- land: steep little shelf, DEM macro relief, glacial rock knobs ----
+shelf = 7.0*(1.0-np.exp(-np.maximum(d,0)/26.0))
+ramp  = np.clip(np.maximum(d,0)/70.0,0,1)**0.7
+# Un islote de 20 m no puede levantar los 40 m que el DEM marca para el cerro
+# de al lado: quedaba como un penasco de caras verticales. El relieve macro se
+# escala por el tamano de la masa de tierra, no solo por la distancia a la costa.
+isla  = np.clip((boxblur((d>0).astype(float),42,2)-0.22)*2.4,0,1)
+land  = shelf + EXAG*macro*ramp*isla
+
+kmod  = np.clip(np.maximum(d,0)/38.0,0,1)*(1.0-0.85*villa)*(0.25+0.75*isla)
+knob  = (ridged(LX,LY,115.0,3,seed=21)**2.2
+        +0.50*ridged(LX,LY, 44.0,2,seed=33)**2.5
+        +0.20*ridged(LX,LY, 17.0,2,seed=55)**2.8)/1.70
+land += kmod*12.5*knob
+
+# glacially scoured bedrock sits in benches, not in smooth domes
+T=10.5
+fr=land/T-np.floor(land/T)
+sm=np.clip((fr-0.34)/0.30,0,1); sm=sm*sm*(3-2*sm)
+land=land*(1-0.20*kmod)+((np.floor(land/T)+sm)*T)*(0.20*kmod)
+
+dmod  = np.clip(np.maximum(d,0)/15.0,0,1)*(1.0-0.7*villa)
+land += dmod*(2.8*(fbm(LX,LY,30.0,4,0.5,2.0,seed=44)-0.5)
+             +1.1*(fbm(LX,LY,11.0,3,0.5,2.0,seed=88)-0.5))
+
+ad    = np.maximum(-d,0)
+depth = 2.2*(1.0-np.exp(-ad/18.0)) + 62.0*(1.0-np.exp(-ad/320.0))
+depth+= np.clip(ad/60.0,0,1)*3.2*(fbm(LX,LY,110.0,4,0.5,2.0,seed=63)-0.5)
+
+H=np.where(d>0,land,-depth)
+H=boxblur(H,1,1)
+
+# El perimetro del cuadrado se hunde bajo el nivel del mar: la juntura entre el
+# Terrain y la malla de fondo queda debajo del agua, donde no se ve. Va antes
+# del splat a proposito, asi la franja hundida se pinta sola como lecho marino.
+H=hundir_borde(H, mascara_borde_terrain(WX,WZ))
+print("borde hundido: max en el perimetro %.1f m"%max(H[0].max(),H[-1].max(),H[:,0].max(),H[:,-1].max()),flush=True)
+print("height min %.1f max %.1f"%(H.min(),H.max()),flush=True)
+np.clip((H-BASE_Y)/RANGE_Y,0,1).astype(np.float32).tofile('heights.bin')
+
+# ---------------- splat ----------------
+cell=2*HALF/(RES-1)
+gz,gx=np.gradient(H,cell); slope=np.degrees(np.arctan(np.hypot(gx,gz)))
+WXa,WZa,LXa,LYa=grid(ARES)
+def rs(A):
+    i=np.linspace(0,RES-1,ARES); I,J=np.meshgrid(i,i)
+    i0=I.astype(int); j0=J.astype(int)
+    i1=np.minimum(i0+1,RES-1); j1=np.minimum(j0+1,RES-1); fi=I-i0; fj=J-j0
+    return (A[j0,i0]*(1-fi)*(1-fj)+A[j0,i1]*fi*(1-fj)+A[j1,i0]*(1-fi)*fj+A[j1,i1]*fi*fj)
+Ha=rs(H); Sl=rs(slope); Da=rs(d); Kn=rs(knob*kmod); Vi=rs(villa)
+cov={k:raster(v,LXa,LYa) for k,v in polys.items()
+     if k in ('wood','scrub','heath','bare_rock','beach','wetland','grassland')}
+n1=fbm(LXa,LYa,45.0,4,0.5,2.0,seed=101)
+n2=fbm(LXa,LYa,120.0,3,0.5,2.0,seed=202)
+n3=fbm(LXa,LYa,25.0,3,0.5,2.0,seed=303)
+
+MUSGO,MATO,ROCA,RIBERA,NIEVE,LECHO=range(6)
+W=np.zeros((ARES,ARES,6))
+W[...,MUSGO]=0.55+0.35*n2
+W[...,MATO] =0.45+0.35*(1-n2)
+# Pedido del usuario (2026-09-21): toda la tierra tiene que verse como la isla
+# del jugador, medida en 46% musgo / 29% matorral / 20% roca. Los poligonos de
+# cobertura de OSM ya no pintan: dependen de cuanto mapeo alguien cada zona, y con
+# el area grande traen 19 km2 de bare_rock que dejaban manchas grises enormes.
+# Solo quedan el pueblo (abajo) y las playas. La mezcla base reproduce la
+# proporcion musgo/matorral de la isla del jugador (~1.6).
+USAR_COBERTURA_OSM=False
+W[...,MUSGO]=0.66+0.30*n2
+W[...,MATO] =0.34+0.30*(1-n2)
+if USAR_COBERTURA_OSM:
+    W[cov['wood']]=0; W[cov['wood'],MUSGO]=0.85; W[cov['wood'],MATO]=0.25
+    for k in ('scrub','heath'):
+        W[cov[k]]=0; W[cov[k],MATO]=0.9; W[cov[k],MUSGO]=0.2
+    W[cov['wetland']]=0; W[cov['wetland'],MUSGO]=1.0
+    if cov['bare_rock'].any(): W[cov['bare_rock']]=0; W[cov['bare_rock'],ROCA]=1.0
+W[Vi>0.55]=0; W[Vi>0.55,MUSGO]=0.8; W[Vi>0.55,MATO]=0.35
+
+rock=np.maximum(np.clip((Sl-17.0)/13.0,0,1),np.clip((Kn-0.62)/0.25,0,1)*0.55)*(0.55+0.45*n3)
+rock*=np.clip(Da/10.0,0,1)*(1.0-0.8*Vi)
+W*=np.clip(1.0-rock,0.2,1.0)[...,None]
+W[...,ROCA]=np.maximum(W[...,ROCA],rock*1.7)
+
+# narrow dark intertidal band, wider only where the shore is flat
+# Ensanchar la franja en terreno tendido es correcto, pero con 4.5 m de holgura
+# la meseta del pueblo entera (3-7 m) quedaba pintada de canto rodado.
+band=np.clip(1.0-np.abs(Ha-0.4)/(1.2+1.5*np.clip(1-Sl/8,0,1)),0,1)**1.5
+W[...,RIBERA]=np.maximum(W[...,RIBERA],band*(1.4+0.4*n3))
+if cov['beach'].any(): W[cov['beach'],RIBERA]=2.0
+
+# snow: patchy caps up high, a faint dusting lower down
+flat=np.clip(1.0-(Sl-12.0)/28.0,0,1)
+# La nieve tiene albedo ~7x el del musgo, asi que un 20% de peso ya pinta la
+# ladera entera de blanco. Para que lea como "un poco nevado" el peso maximo
+# tiene que quedar por debajo de ~0.3.
+snow =np.clip((Ha-24.0)/30.0,0,1)*flat*np.clip(n1*2.0-0.72,0,1)*0.80
+snow+=np.clip((Ha-8.0)/20.0,0,1)*flat*0.20*np.clip(n1*2.3-1.20,0,1)
+snow=np.clip(snow,0,0.42)
+W*=np.clip(1.0-snow*0.85,0.30,1.0)[...,None]
+W[...,NIEVE]=snow*1.0
+
+sub=np.clip(-Ha/1.4,0,1)
+W*=(1.0-sub)[...,None]
+W[...,LECHO]=sub*2.0
+W[...,RIBERA]+=np.clip(1.0-np.abs(Ha+1.0)/2.6,0,1)*0.8
+W=np.maximum(W,1e-4); W/=W.sum(axis=2,keepdims=True)
+W.astype(np.float32).tofile('splat.bin')
+land_m=Ha>0
+for i,n in enumerate(['musgo','matorral','roca','ribera','nieve','lecho']):
+    print("  %-9s all %.3f  on-land %.3f"%(n,W[...,i].mean(),W[land_m,i].mean()))
+print("slope on land: p50 %.1f p90 %.1f max %.1f"%(np.percentile(Sl[land_m],50),np.percentile(Sl[land_m],90),Sl[land_m].max()))
+print("total %.0fs"%(time.time()-t0))
