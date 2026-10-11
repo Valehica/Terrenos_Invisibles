@@ -24,7 +24,7 @@ MonoBehaviour:
     m_Value: 0.25
   scatter:
     m_OverrideState: 1
-    m_Value: 0.5
+    m_Value: 0.464
   clamp:
     m_OverrideState: 0
     m_Value: 65472
@@ -68,10 +68,10 @@ MonoBehaviour:
     m_Value: {x: 0.5, y: 0.5}
   intensity:
     m_OverrideState: 1
-    m_Value: 0.2
+    m_Value: 0.181
   smoothness:
     m_OverrideState: 1
-    m_Value: 0.2
+    m_Value: 0.738
   rounded:
     m_OverrideState: 0
     m_Value: 0
@@ -90,13 +90,13 @@ MonoBehaviour:
   active: 1
   pasosDeLuz:
     m_OverrideState: 1
-    m_Value: 6
+    m_Value: 2
   suavidadBorde:
     m_OverrideState: 1
-    m_Value: 0.26
+    m_Value: 0.089
   fuerzaPintura:
     m_OverrideState: 1
-    m_Value: 0.38
+    m_Value: 0.178
   escalaPigmento:
     m_OverrideState: 1
     m_Value: 0.05
@@ -159,7 +159,7 @@ MonoBehaviour:
     m_Value: 500
   tinteAire:
     m_OverrideState: 1
-    m_Value: 0.7
+    m_Value: 0.439
   desaturacionAire:
     m_OverrideState: 1
     m_Value: 0.58

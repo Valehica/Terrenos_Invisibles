@@ -1,0 +1,237 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &2514623316289031672
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 136551819644543467}
+  - component: {fileID: 24406417204626750}
+  - component: {fileID: 8898077124567622525}
+  - component: {fileID: 337385682289432291}
+  m_Layer: 0
+  m_Name: Gaviotin
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &136551819644543467
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2514623316289031672}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 4065996048489040717}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!135 &24406417204626750
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2514623316289031672}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Radius: 0.3
+  m_Center: {x: 0, y: 0.15, z: 0}
+--- !u!114 &8898077124567622525
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2514623316289031672}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9155d463758dc6249a1662498a3650f0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  speciesId: gaviotin
+  displayName: "Gaviot\xEDn"
+  scientificName: Sterna hirundinacea
+  description: "Ave \xE1gil y activa que suele desplazarse cerca de zonas costeras
+    y cuerpos de agua. Se mantiene en constante movimiento, alternando entre volar,
+    posarse y buscar alimento. Ante la presencia de personas, puede alejarse volando
+    r\xE1pidamente."
+--- !u!114 &337385682289432291
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2514623316289031672}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 553e81a660177624ba073ee8f4a1e13c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  centroZona: {fileID: 0}
+  radioZona: 60
+  puntosDePosado: []
+  posaderosAutomaticos: 40
+  distanciaMaxAlAgua: 30
+  pendienteMaxima: 25
+  distanciaMinimaEntrePosaderos: 15
+  marea: {fileID: 0}
+  mar: {fileID: 0}
+  capasSuelo:
+    serializedVersion: 2
+    m_Bits: 4294959561
+  tiempoPosado: {x: 10, y: 25}
+  pausaEntreGestos: {x: 1.5, y: 4}
+  probRascar: 0.4
+  probGorjear: 0.35
+  anguloGiro: {x: 30, y: 90}
+  velocidadCrucero: 6
+  velocidadHuida: 12
+  giroMaximo: 100
+  alturaVuelo: {x: 5, y: 12}
+  alturaSegura: 1.5
+  inclinacionMaxima: 35
+  cabeceoMaximo: 35
+  tramosDePaseo: {x: 1, y: 3}
+  alturaAcecho: 6
+  radioAcecho: 5
+  tiempoAcecho: {x: 1.5, y: 4}
+  picadas: {x: 1, y: 3}
+  velocidadPicada: 10
+  profundidadMinima: 1
+  efectoChapuzon: {fileID: 0}
+  distanciaAlerta: 5
+  distanciaHuida: 2.5
+  distanciaHuidaAgachado: 1.2
+  distanciaRefugio: 15
+  alturaHuidaEnVuelo: 3
+  fundido: 0.25
+  despegueSueltaSuelo: 0.3
+  aterrizajeToqueSuelo: 0.65
+  velocidadDespegueHuida: 1.5
+  graznidos: []
+  sonidoChapuzon: {fileID: 0}
+--- !u!1001 &4604904919762840742
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 136551819644543467}
+    m_Modifications:
+    - target: {fileID: -8679921383154817045, guid: 1e0574d3cd950f04994e763fdc921fde, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.118644066
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 1e0574d3cd950f04994e763fdc921fde, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.118644066
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 1e0574d3cd950f04994e763fdc921fde, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.118644066
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 1e0574d3cd950f04994e763fdc921fde, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 1e0574d3cd950f04994e763fdc921fde, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 1e0574d3cd950f04994e763fdc921fde, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 1e0574d3cd950f04994e763fdc921fde, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 1e0574d3cd950f04994e763fdc921fde, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 1e0574d3cd950f04994e763fdc921fde, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 1e0574d3cd950f04994e763fdc921fde, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 1e0574d3cd950f04994e763fdc921fde, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 1e0574d3cd950f04994e763fdc921fde, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 1e0574d3cd950f04994e763fdc921fde, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -2426281212347190925, guid: 1e0574d3cd950f04994e763fdc921fde, type: 3}
+      propertyPath: m_RenderingLayerMask
+      value: 257
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 1e0574d3cd950f04994e763fdc921fde, type: 3}
+      propertyPath: m_Name
+      value: Modelo
+      objectReference: {fileID: 0}
+    - target: {fileID: 5866666021909216657, guid: 1e0574d3cd950f04994e763fdc921fde, type: 3}
+      propertyPath: m_Controller
+      value: 
+      objectReference: {fileID: 9100000, guid: b716da65b56562e4fa107d476b204451, type: 2}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 1e0574d3cd950f04994e763fdc921fde, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 7322904004264221098}
+  m_SourcePrefab: {fileID: 100100000, guid: 1e0574d3cd950f04994e763fdc921fde, type: 3}
+--- !u!1 &3685775669710852599 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 1e0574d3cd950f04994e763fdc921fde, type: 3}
+  m_PrefabInstance: {fileID: 4604904919762840742}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &7322904004264221098
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3685775669710852599}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 612b568fbafbfa4418fcbce81aab8022, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  recorrido: 0.1
+  fLimpio: 0.4
+  fMedia: 0.8
+--- !u!4 &4065996048489040717 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 1e0574d3cd950f04994e763fdc921fde, type: 3}
+  m_PrefabInstance: {fileID: 4604904919762840742}
+  m_PrefabAsset: {fileID: 0}

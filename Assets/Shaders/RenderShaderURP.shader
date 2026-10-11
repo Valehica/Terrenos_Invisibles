@@ -27,6 +27,8 @@ Shader "Hidden/Terrenos/RenderShaderURP"
         float4 _ArenaRango;
         float4 _CieloParams;      // igual, pero para los azules: cielo y agua
         float4 _CieloRango;
+        float _UsarMascara;       // 1 si RenderShaderURP armo la mascara de personajes
+        TEXTURE2D_X(_MascaraPersonajes);
 
         static const float3 LUMA = float3(0.299, 0.587, 0.114);
 
@@ -119,6 +121,12 @@ Shader "Hidden/Terrenos/RenderShaderURP"
                 // pasar de 1. Se trabaja sobre lum/(1+lum), que comprime el rango a
                 // 0..1 sin recortar: cuantizar directo en HDR apagaría el efecto en
                 // todo lo que esté sobreexpuesto, que es media imagen a pleno sol.
+                // Personajes y animales: ni cuantizacion ni bandas de color, que estan
+                // calibradas para el paisaje (ver MascaraPersonajes.shader).
+                float libre = 1.0;
+                if (_UsarMascara > 0.5)
+                    libre = 1.0 - SAMPLE_TEXTURE2D_X(_MascaraPersonajes, sampler_PointClamp, uv).r;
+
                 float lum = dot(col, LUMA);
                 float lt = lum / (1.0 + lum);
 
@@ -131,7 +139,7 @@ Shader "Hidden/Terrenos/RenderShaderURP"
 
                 // Solo los medios: las sombras profundas y las luces quemadas se dejan
                 // continuas, porque ahí el escalón se ve como error y no como pincelada.
-                float peso = _PinturaParams.z
+                float peso = _PinturaParams.z * libre
                            * smoothstep(0.03, 0.20, lt)
                            * smoothstep(0.98, 0.80, lt);
                 float ltN = lerp(lt, ltQ, peso);
@@ -155,10 +163,10 @@ Shader "Hidden/Terrenos/RenderShaderURP"
                     // calida y x1.6 encima la moteaba de amarillo; el pasto x1.45 dejaba
                     // el 21% de las hojas recortadas en (1,1,0). Medido en Centro: techo
                     // 0.88 da pasto sat 0.35 sin recorte; 0.6 ya lo deja gris.
-                    float suelo = esCielo ? 0.0 : 1.0;
+                    float suelo = esCielo ? 0.0 : libre;
                     AjustarBanda(hsv, _ArenaParams, _ArenaRango, suelo, 0.35);
                     AjustarBanda(hsv, _VegeParams, _VegeRango, suelo, 0.88);
-                    AjustarBanda(hsv, _CieloParams, _CieloRango, 1.0, 1.0);
+                    AjustarBanda(hsv, _CieloParams, _CieloRango, libre, 1.0);
                     col = HSVaRGB(hsv);
                 }
 

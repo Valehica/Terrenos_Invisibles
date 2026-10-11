@@ -149,6 +149,15 @@ Packages/packages-lock.json linguist-generated
 *.skel.bytes            lfs
 # Exceptions for .asset files such as lightning pre-baking
 LightingData.asset     binary
+# Datos de terreno grandes propios (binarios de 15-100 MB)
+Assets/Terrain/*.asset lfs
+Assets/Textures/ShoreDistance_*.asset lfs
+Assets/Textures/TerrainHeight_*.asset lfs
+Assets/Meshes/*.asset lfs
+Tools/TerrenoSur/**/*.asset lfs
+Assets/FlipGameDev/Terrain&GrassPack/Terrain_Settings/Data/*.asset lfs
+*.bin lfs
+*.hgt lfs
 /Assets/FlipGameDev/Terrain&GrassPack/Demo/Demo/LightingData.asset filter=lfs diff=lfs merge=lfs -text
 /Assets/FlipGameDev/Terrain&GrassPack/Terrain_Settings/Data/Demo.asset filter=lfs diff=lfs merge=lfs -text
 /Assets/Terrain/TerrainData_Sur.asset filter=lfs diff=lfs merge=lfs -text

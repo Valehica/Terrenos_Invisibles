@@ -1,4 +1,6 @@
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Experimental.Rendering;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.RenderGraphModule;
 using UnityEngine.Rendering.Universal;
@@ -16,6 +18,12 @@ public class RenderShaderURP : ScriptableRendererFeature
     public class Ajustes
     {
         public Shader shader;
+        [Tooltip("Hidden/Terrenos/MascaraPersonajes. Sin el, los personajes reciben el pase completo.")]
+        public Shader shaderMascara;
+        [Tooltip("Capa de render de los personajes y animales. A ellos no se les aplica la " +
+                 "cuantizacion de luz ni las bandas de color (calibradas para el paisaje); " +
+                 "si el pigmento y la perspectiva aerea. Nada = sin mascara.")]
+        public RenderingLayerMask capaPersonajes = 0;
         public RenderPassEvent evento = RenderPassEvent.BeforeRenderingPostProcessing;
 
         [Header("Cuantizacion de luz")]
@@ -82,6 +90,7 @@ public class RenderShaderURP : ScriptableRendererFeature
     public Ajustes ajustes = new Ajustes();
 
     private Material material;
+    private Material materialMascara;
     private EstiloPass pass;
 
     public override void Create()
@@ -97,8 +106,10 @@ public class RenderShaderURP : ScriptableRendererFeature
         if (type != CameraType.Game && type != CameraType.SceneView) return;
 
         if (material == null) material = CoreUtils.CreateEngineMaterial(ajustes.shader);
+        if (materialMascara == null && ajustes.shaderMascara != null)
+            materialMascara = CoreUtils.CreateEngineMaterial(ajustes.shaderMascara);
 
-        pass.Setup(material, ajustes);
+        pass.Setup(material, materialMascara, ajustes);
         pass.ConfigureInput(ScriptableRenderPassInput.Depth);
         renderer.EnqueuePass(pass);
     }
@@ -106,6 +117,7 @@ public class RenderShaderURP : ScriptableRendererFeature
     protected override void Dispose(bool disposing)
     {
         CoreUtils.Destroy(material);
+        CoreUtils.Destroy(materialMascara);
     }
 
     private class EstiloPass : ScriptableRenderPass
@@ -122,8 +134,18 @@ public class RenderShaderURP : ScriptableRendererFeature
         private static readonly int CieloRango = Shader.PropertyToID("_CieloRango");
         private static readonly int AireColorGlobal = Shader.PropertyToID("_AireColorGlobal");
         private static readonly int AireParamsGlobal = Shader.PropertyToID("_AireParamsGlobal");
+        private static readonly int MascaraPersonajes = Shader.PropertyToID("_MascaraPersonajes");
+        private static readonly int UsarMascara = Shader.PropertyToID("_UsarMascara");
+
+        private static readonly List<ShaderTagId> PasesOpacos = new List<ShaderTagId>
+        {
+            new ShaderTagId("UniversalForward"),
+            new ShaderTagId("UniversalForwardOnly"),
+            new ShaderTagId("SRPDefaultUnlit"),
+        };
 
         private Material material;
+        private Material materialMascara;
         private Ajustes ajustes;
 
         private class PassData
@@ -131,11 +153,18 @@ public class RenderShaderURP : ScriptableRendererFeature
             public Material material;
             public TextureHandle source;
             public int pass;
+            public TextureHandle mascara;
         }
 
-        public void Setup(Material mat, Ajustes a)
+        private class MascaraData
+        {
+            public RendererListHandle lista;
+        }
+
+        public void Setup(Material mat, Material matMascara, Ajustes a)
         {
             material = mat;
+            materialMascara = matMascara;
             ajustes = a;
         }
 
@@ -216,12 +245,54 @@ public class RenderShaderURP : ScriptableRendererFeature
             // el efecto va a un intermedio y una copia lo devuelve al color de cámara.
             TextureHandle temp = UniversalRenderer.CreateRenderGraphTexture(renderGraph, desc, "_RenderShaderURP", false);
 
-            AddPass(renderGraph, "RenderShaderURP", color, temp, 0, AccessFlags.Write);
-            AddPass(renderGraph, "RenderShaderURP: copia", temp, color, 1, AccessFlags.Write);
+            TextureHandle mascara = AddMascara(renderGraph, frameData, desc);
+            material.SetFloat(UsarMascara, mascara.IsValid() ? 1f : 0f);
+
+            AddPass(renderGraph, "RenderShaderURP", color, temp, 0, AccessFlags.Write, mascara);
+            AddPass(renderGraph, "RenderShaderURP: copia", temp, color, 1, AccessFlags.Write, TextureHandle.nullHandle);
+        }
+
+        // Pinta en una R8 los renderers de la capa de personajes que no esten tapados.
+        private TextureHandle AddMascara(RenderGraph renderGraph, ContextContainer frameData, RenderTextureDescriptor desc)
+        {
+            uint capa = ajustes.capaPersonajes;
+            if (capa == 0 || materialMascara == null) return TextureHandle.nullHandle;
+
+            var resources = frameData.Get<UniversalResourceData>();
+            var renderingData = frameData.Get<UniversalRenderingData>();
+            var cameraData = frameData.Get<UniversalCameraData>();
+            var lightData = frameData.Get<UniversalLightData>();
+            if (!resources.cameraDepthTexture.IsValid()) return TextureHandle.nullHandle;
+
+            var dibujo = RenderingUtils.CreateDrawingSettings(PasesOpacos, renderingData, cameraData, lightData,
+                                                              SortingCriteria.CommonOpaque);
+            dibujo.overrideMaterial = materialMascara;
+            dibujo.overrideMaterialPassIndex = 0;
+            var filtro = new FilteringSettings(RenderQueueRange.opaque) { renderingLayerMask = capa };
+
+            desc.graphicsFormat = GraphicsFormat.R8_UNorm;
+            TextureHandle mascara = UniversalRenderer.CreateRenderGraphTexture(renderGraph, desc, "_MascaraPersonajes", true);
+
+            using (var builder = renderGraph.AddRasterRenderPass<MascaraData>("RenderShaderURP: mascara personajes", out var data))
+            {
+                data.lista = renderGraph.CreateRendererList(new RendererListParams(renderingData.cullResults, dibujo, filtro));
+                builder.UseRendererList(data.lista);
+                builder.UseTexture(resources.cameraDepthTexture);
+                builder.UseAllGlobalTextures(true);
+                builder.SetRenderAttachment(mascara, 0, AccessFlags.Write);
+                builder.AllowPassCulling(false);
+
+                builder.SetRenderFunc((MascaraData d, RasterGraphContext ctx) =>
+                {
+                    ctx.cmd.ClearRenderTarget(false, true, Color.clear);
+                    ctx.cmd.DrawRendererList(d.lista);
+                });
+            }
+            return mascara;
         }
 
         private void AddPass(RenderGraph renderGraph, string name, TextureHandle source, TextureHandle target,
-                             int shaderPass, AccessFlags targetAccess)
+                             int shaderPass, AccessFlags targetAccess, TextureHandle mascara)
         {
             using (var builder = renderGraph.AddRasterRenderPass<PassData>(name, out var data))
             {
@@ -230,12 +301,17 @@ public class RenderShaderURP : ScriptableRendererFeature
                 data.pass = shaderPass;
 
                 builder.UseTexture(source);
+                data.mascara = mascara;
+                if (mascara.IsValid()) builder.UseTexture(mascara);
                 builder.UseAllGlobalTextures(true);
                 builder.SetRenderAttachment(target, 0, targetAccess);
                 builder.AllowPassCulling(false);
 
                 builder.SetRenderFunc((PassData d, RasterGraphContext ctx) =>
-                    Blitter.BlitTexture(ctx.cmd, d.source, new Vector4(1f, 1f, 0f, 0f), d.material, d.pass));
+                {
+                    if (d.mascara.IsValid()) d.material.SetTexture(MascaraPersonajes, d.mascara);
+                    Blitter.BlitTexture(ctx.cmd, d.source, new Vector4(1f, 1f, 0f, 0f), d.material, d.pass);
+                });
             }
         }
     }

@@ -105,3 +105,27 @@ InitTestScene*.unity*
 
 # Auto-generated scenes by play mode tests
 /[Aa]ssets/[Ii]nit[Tt]est[Ss]cene*.unity*
+
+# Demos y escenas de ejemplo de packs de la Asset Store (no usadas por el juego)
+/Assets/ADG_Textures/Demo/
+/Assets/ADG_Textures/Demo.meta
+/Assets/ALP_Assets/GrassFlowersFREE/Demo/
+/Assets/ALP_Assets/GrassFlowersFREE/Demo.meta
+/Assets/BushGrassBend/Demo/
+/Assets/BushGrassBend/Demo.meta
+/Assets/FlipGameDev/Terrain&GrassPack/Demo/
+/Assets/FlipGameDev/Terrain&GrassPack/Demo.meta
+/Assets/FlipGameDev/Terrain&GrassPack/Terrain_Settings/Data/Demo.asset
+/Assets/FlipGameDev/Terrain&GrassPack/Terrain_Settings/Data/Demo.asset.meta
+/Assets/TerrainTexturesPackFree/DemoScene/
+/Assets/TerrainTexturesPackFree/DemoScene.meta
+/Assets/TENKOKU - DYNAMIC SKY/_DEMO/
+/Assets/TENKOKU - DYNAMIC SKY/_DEMO.meta
+/Assets/Grass And Flowers Pack 1/Example Scene/
+/Assets/Grass And Flowers Pack 1/Example Scene.meta
+/Assets/YughuesFreeCobbleMaterials/Preview/
+/Assets/YughuesFreeCobbleMaterials/Preview.meta
+/Assets/PBR_Grass_Textures/example_scene.unity
+/Assets/PBR_Grass_Textures/example_scene.unity.meta
+/Assets/Materials Collection/4 Snow Materials/All materials (snow).unity
+/Assets/Materials Collection/4 Snow Materials/All materials (snow).unity.meta

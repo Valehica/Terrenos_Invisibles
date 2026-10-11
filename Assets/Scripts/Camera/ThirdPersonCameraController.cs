@@ -23,9 +23,14 @@ public class ThirdPersonCameraController : MonoBehaviour
     [SerializeField] private Vector3 firstPersonOffset = new Vector3(0f, 1.6f, 0f);
     [SerializeField] private float firstPersonMinPitch = -80f;
     [SerializeField] private float firstPersonMaxPitch = 85f;
-    [SerializeField] private float firstPersonMinFov = 15f;
+    [SerializeField] private float zoomMinFov = 5f;
     [SerializeField] private float firstPersonMaxFov = 60f;
-    [SerializeField] private float firstPersonZoomSpeed = 15f;
+    [Tooltip("How much each scroll notch zooms in (1.25 = 25% closer per notch).")]
+    [SerializeField] private float zoomPerNotch = 1.25f;
+    [Tooltip("How fast the FOV catches up with the target zoom.")]
+    [SerializeField] private float zoomSmoothing = 12f;
+    [Tooltip("Scale mouse look with the zoom so aiming stays steady when zoomed in.")]
+    [SerializeField] private bool scaleLookWithZoom = true;
     [SerializeField] private GameObject phoneUI;
 
 
@@ -44,7 +49,11 @@ public class ThirdPersonCameraController : MonoBehaviour
     private Transform dialogueTarget;
     private Camera cam;
     private float defaultFov;
+    private float targetFov;
     public static bool IsFirstPerson { get; private set; }
+
+    /// <summary>Phone camera magnification (1 = no zoom).</summary>
+    public static float ZoomFactor { get; private set; } = 1f;
 
 
 
@@ -58,6 +67,7 @@ private void Start()
         cam = GetComponent<Camera>();
         if (cam != null)
             defaultFov = cam.fieldOfView;
+        targetFov = defaultFov;
 
         if (target != null)
             playerRenderers = target.GetComponentsInChildren<Renderer>(true);
@@ -78,11 +88,16 @@ private void Update()
         if (Keyboard.current.eKey.wasPressedThisFrame)
             SetFirstPerson(!isFirstPerson);
 
-        if (isFirstPerson && cam != null && Mouse.current != null)
+        if (isFirstPerson && cam != null)
         {
-            float scroll = Mouse.current.scroll.ReadValue().y;
+            // Scroll is a per-frame delta (±1 per notch), so it must not be scaled by deltaTime.
+            // Zooming by a factor per notch feels the same at 60° and at 5°.
+            float scroll = Mouse.current != null ? Mouse.current.scroll.ReadValue().y : 0f;
             if (Mathf.Abs(scroll) > 0.01f)
-                cam.fieldOfView = Mathf.Clamp(cam.fieldOfView - scroll * firstPersonZoomSpeed * Time.deltaTime, firstPersonMinFov, firstPersonMaxFov);
+                targetFov = Mathf.Clamp(targetFov / Mathf.Pow(zoomPerNotch, scroll), zoomMinFov, firstPersonMaxFov);
+
+            cam.fieldOfView = Mathf.Lerp(cam.fieldOfView, targetFov, 1f - Mathf.Exp(-zoomSmoothing * Time.deltaTime));
+            ZoomFactor = defaultFov / cam.fieldOfView;
         }
 
     }
@@ -103,8 +118,10 @@ private void LateUpdate()
         if (cursorLocked && Mouse.current != null)
         {
             Vector2 lookDelta = Mouse.current.delta.ReadValue();
-            yaw += lookDelta.x * mouseSensitivity;
-            pitch -= lookDelta.y * mouseSensitivity;
+            float sensitivity = mouseSensitivity;
+            if (isFirstPerson && scaleLookWithZoom) sensitivity /= ZoomFactor;
+            yaw += lookDelta.x * sensitivity;
+            pitch -= lookDelta.y * sensitivity;
             pitch = Mathf.Clamp(pitch, pitchMin, pitchMax);
         }
 
@@ -129,6 +146,8 @@ private void SetFirstPerson(bool enabled)
 
         if (cam != null)
             cam.fieldOfView = defaultFov;
+        targetFov = defaultFov;
+        ZoomFactor = 1f;
 
         if (phoneUI != null)
             phoneUI.SetActive(enabled);

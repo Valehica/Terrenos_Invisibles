@@ -94,6 +94,10 @@ MonoBehaviour:
   m_Active: 1
   ajustes:
     shader: {fileID: 4800000, guid: 56732d4fc1ddc8e4bbd665b23a40ee87, type: 3}
+    shaderMascara: {fileID: 4800000, guid: 2e2aa382292903643aa8f8c072205040, type: 3}
+    capaPersonajes:
+      serializedVersion: 0
+      m_Bits: 256
     evento: 550
     pasosDeLuz: 6
     suavidadBorde: 0.22

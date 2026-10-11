@@ -6,6 +6,8 @@ public class AnimalScanner : MonoBehaviour
 {
     [Header("Detección")]
     [SerializeField] private float scanRange = 15f;
+    [Tooltip("With the phone zoomed in the range grows with the zoom, up to this multiple of Scan Range.")]
+    [SerializeField] private float maxZoomRangeMultiplier = 4f;
     [SerializeField] private LayerMask scanMask = ~0;
     [SerializeField] private float scanDuration = 4f;
 
@@ -75,7 +77,8 @@ public class AnimalScanner : MonoBehaviour
     private Scannable RaycastForScannable()
     {
         Ray ray = new Ray(cam.transform.position, cam.transform.forward);
-        if (Physics.Raycast(ray, out RaycastHit hit, scanRange, scanMask, QueryTriggerInteraction.Collide))
+        float range = scanRange * Mathf.Clamp(ThirdPersonCameraController.ZoomFactor, 1f, maxZoomRangeMultiplier);
+        if (Physics.Raycast(ray, out RaycastHit hit, range, scanMask, QueryTriggerInteraction.Collide))
             return hit.collider.GetComponentInParent<Scannable>();
         return null;
     }

@@ -3,7 +3,17 @@ guid: f597c1194cf482644a8324c453f96a55
 ModelImporter:
   serializedVersion: 22200
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: M_Quenoa_Corteza
+    second: {fileID: 2100000, guid: 200b5af07a822e24fbb7d31404cf2452, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: M_Quenoa_Hojas
+    second: {fileID: 2100000, guid: 435089225f7b8ae458af77508cca1a7d, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0
