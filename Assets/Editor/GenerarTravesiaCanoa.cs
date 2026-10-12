@@ -19,7 +19,7 @@ public static class GenerarTravesiaCanoa
 {
     private const string RootName = "MinijuegoCanoa";
     private const string AssetFolder = "Assets/Minigame/Canoa";
-    private const string RocksFolder = "Assets/FlipGameDev/Terrain&GrassPack/Art/Meshes/Rocks/";
+    private const string RocksFolder = "Assets/AssetStoreResourses/FlipGameDev/Terrain&GrassPack/Art/Meshes/Rocks/";
     private const float WaterY = 0f;
     private const int Seed = 20260921;
 

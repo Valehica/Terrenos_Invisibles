@@ -1,0 +1,80 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 8
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: MarSur
+  m_Shader: {fileID: 4800000, guid: 16c4e1f24ae42914f8474b32c1e71029, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
+  m_ValidKeywords:
+  - _CAUSTICAS
+  m_InvalidKeywords: []
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_LockedProperties: 
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _OndasN:
+        m_Texture: {fileID: 2800000, guid: 4d8993c9810aeb8418aedbf562faa169, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Ruido:
+        m_Texture: {fileID: 2800000, guid: 6377340aee3658342b903a632feb5167, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Ints: []
+    m_Floats:
+    - _BordeSuave: 0.06
+    - _Brillo: 350
+    - _BrilloCuerpo: 0.4
+    - _BrilloIntensidad: 1.8
+    - _Causticas: 1
+    - _CausticasEscala: 0.28
+    - _CausticasIntensidad: 1.3
+    - _CausticasProfundidad: 4
+    - _CausticasVelocidad: 0.04
+    - _Claridad: 3
+    - _DestellosEscala: 0.35
+    - _DestellosIntensidad: 5
+    - _DestellosPotencia: 90
+    - _EspumaAncho: 0.18
+    - _EspumaRuidoEscala: 0.09
+    - _FresnelMax: 0.8
+    - _FresnelMin: 0.03
+    - _FresnelPotencia: 4
+    - _LineasAlcance: 1.4
+    - _LineasFrecuencia: 1.6
+    - _LineasGrosor: 0.14
+    - _LineasVelocidad: 0.22
+    - _MezclaCieloSH: 0.3
+    - _OndasDistancia: 220
+    - _OndasEscala: 0.045
+    - _OndasFuerza: 0.3
+    - _OndasVelocidad: 0.7
+    - _ProfundidadMedia: 2.5
+    - _ProfundidadPlena: 16
+    - _Refraccion: 0.025
+    - _VelocidadOlas: 1
+    m_Colors:
+    - _ColorCenit: {r: 0.35999998, g: 0.62, b: 0.92, a: 1}
+    - _ColorEspuma: {r: 1, g: 1, b: 1, a: 0.95}
+    - _ColorHorizonte: {r: 0.78, g: 0.9, b: 0.96, a: 1}
+    - _ColorMedio: {r: 0.08, g: 0.47, b: 0.62, a: 1}
+    - _ColorProfundo: {r: 0.04, g: 0.23, b: 0.42, a: 1}
+    - _ColorSomero: {r: 0.29999998, g: 0.86, b: 0.8, a: 1}
+    - _OlaA: {r: 0.25, g: 1, b: 0.012, a: 140}
+    - _OlaB: {r: -0.45, g: 1, b: 0.0108, a: 96}
+    - _OlaC: {r: 0.7, g: 1, b: 0.0072000003, a: 70}
+    - _TinteFondo: {r: 0.54999995, g: 0.95, b: 0.9, a: 1}
+  m_BuildTextureStacks: []
+  m_AllowLocking: 1

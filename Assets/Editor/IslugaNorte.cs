@@ -508,13 +508,13 @@ public static class IslugaNorte
     // solo se usan en la zona de montañas, que se conserva como la pinto el usuario.
     static readonly string[] Capas =
     {
-        "Assets/FlipGameDev/Terrain&GrassPack/Terrain_Settings/Terrain_Layers/Mud.terrainlayer",          // 0 pampa
-        "Assets/FlipGameDev/Terrain&GrassPack/Terrain_Settings/Terrain_Layers/Mud_Lieves_1.terrainlayer", // 1 hojarasca de tola
-        "Assets/FlipGameDev/Terrain&GrassPack/Terrain_Settings/Terrain_Layers/Mud_Pebbles.terrainlayer",  // 2 pedregal
+        "Assets/AssetStoreResourses/FlipGameDev/Terrain&GrassPack/Terrain_Settings/Terrain_Layers/Mud.terrainlayer",          // 0 pampa
+        "Assets/AssetStoreResourses/FlipGameDev/Terrain&GrassPack/Terrain_Settings/Terrain_Layers/Mud_Lieves_1.terrainlayer", // 1 hojarasca de tola
+        "Assets/AssetStoreResourses/FlipGameDev/Terrain&GrassPack/Terrain_Settings/Terrain_Layers/Mud_Pebbles.terrainlayer",  // 2 pedregal
         "Assets/Layer-Terrain/NewLayer.terrainlayer",                                                     // 3 montaña (del usuario)
         "Assets/Layer-Terrain/NewLayer 1.terrainlayer",                                                   // 4 suelo rojizo de cerro
         "Assets/Layer-Terrain/NewLayer 3.terrainlayer",                                                   // 5 nieve (del usuario)
-        "Assets/FlipGameDev/Terrain&GrassPack/Terrain_Settings/Terrain_Layers/RockSmooth_20x20.terrainlayer", // 6 roca
+        "Assets/AssetStoreResourses/FlipGameDev/Terrain&GrassPack/Terrain_Settings/Terrain_Layers/RockSmooth_20x20.terrainlayer", // 6 roca
         CarpetaCapas + "Norte_Tierra.terrainlayer",                                                        // 7 camino y calles (tierra apisonada)
         CarpetaCapas + "Norte_Bofedal.terrainlayer",                                                       // 8 bofedal
         CarpetaCapas + "Norte_Pajonal.terrainlayer",                                                       // 9 pajonal

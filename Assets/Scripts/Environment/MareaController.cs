@@ -88,6 +88,11 @@ public class MareaController : MonoBehaviour
     private Vector4[] olasBase = new Vector4[4];
     private float crestaBase;
     private bool materialLeido;
+    private Material materialLeidoDe;
+    // Solo se modula un material con _WaveA.._WaveD (el formato del agua vieja).
+    // Terrenos/Mar no lo tiene: la marea mueve el transform y la espuma de orilla
+    // sale sola del depth buffer, así que no se toca el material.
+    private bool tieneOlas;
 
     private static readonly int[] IdsOlas =
     {
@@ -122,12 +127,16 @@ public class MareaController : MonoBehaviour
         for (int i = 0; i < 4; i++)
             olasBase[i] = mat.HasProperty(IdsOlas[i]) ? mat.GetVector(IdsOlas[i]) : Vector4.zero;
         crestaBase = mat.HasProperty(IdCresta) ? mat.GetFloat(IdCresta) : 1.75f;
+        tieneOlas = mat.HasProperty(IdsOlas[0]);
+        materialLeidoDe = mat;
         materialLeido = true;
+        // Un bloque vacío igual saca al renderer del SRP Batcher.
+        if (!tieneOlas) mr.SetPropertyBlock(null);
     }
 
     private void Update()
     {
-        if (!materialLeido) LeerMaterial();
+        if (!materialLeido || (mr != null && mr.sharedMaterial != materialLeidoDe)) LeerMaterial();
 
         float fase = CalcularFase();
 
@@ -199,7 +208,7 @@ public class MareaController : MonoBehaviour
 
     private void AplicarOleaje()
     {
-        if (mr == null || !materialLeido) return;
+        if (mr == null || !materialLeido || !tieneOlas) return;
 
         float escala = Mathf.Lerp(oleajeEnBajamar, oleajeEnPleamar, Altura01);
 

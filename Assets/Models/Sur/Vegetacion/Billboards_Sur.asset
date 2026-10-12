@@ -1,0 +1,112 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2eb3400059e7f4247853cd4dd9085eea, type: 3}
+  m_Name: Billboards_Sur
+  m_EditorClassIdentifier: 
+  material: {fileID: 2100000, guid: 070532c8f8f09434d82a44e6e08cc0db, type: 2}
+  entradas:
+  - prefab: {fileID: 688573767567988582, guid: 6fe61997f9e25da48a4457e2e59be617, type: 3}
+    uvFrente:
+      serializedVersion: 2
+      x: 0.00024414062
+      y: 0.6669922
+      width: 0.24951172
+      height: 0.33268228
+    uvCostado:
+      serializedVersion: 2
+      x: 0.25024414
+      y: 0.6669922
+      width: 0.24951172
+      height: 0.33268228
+    centro: {x: 0.09046507, y: 2.9895506, z: -0.07993412}
+    ladoFrente: 6.2183056
+    ladoCostado: 6.2183056
+  - prefab: {fileID: 658222745230562129, guid: 36cc7f112a1f16c449063a8e992ed97b, type: 3}
+    uvFrente:
+      serializedVersion: 2
+      x: 0.50024414
+      y: 0.6669922
+      width: 0.24951172
+      height: 0.33268228
+    uvCostado:
+      serializedVersion: 2
+      x: 0.75024414
+      y: 0.6669922
+      width: 0.24951172
+      height: 0.33268228
+    centro: {x: -0.6987395, y: 11.429313, z: -4.7483006}
+    ladoFrente: 23.77297
+    ladoCostado: 23.77297
+  - prefab: {fileID: 1809761103028000104, guid: 560e28f692c24d048a351d21120c806f, type: 3}
+    uvFrente:
+      serializedVersion: 2
+      x: 0.00024414062
+      y: 0.33365884
+      width: 0.24951172
+      height: 0.33268228
+    uvCostado:
+      serializedVersion: 2
+      x: 0.25024414
+      y: 0.33365884
+      width: 0.24951172
+      height: 0.33268228
+    centro: {x: 0.03720522, y: 10.232248, z: -0.3363943}
+    ladoFrente: 21.283075
+    ladoCostado: 21.770283
+  - prefab: {fileID: 780787414192760196, guid: a5c7ae70fd7ab8e41a34e28cec5f6b5f, type: 3}
+    uvFrente:
+      serializedVersion: 2
+      x: 0.50024414
+      y: 0.33365884
+      width: 0.24951172
+      height: 0.33268228
+    uvCostado:
+      serializedVersion: 2
+      x: 0.75024414
+      y: 0.33365884
+      width: 0.24951172
+      height: 0.33268228
+    centro: {x: 0.21250057, y: 11.23003, z: -3.4083135}
+    ladoFrente: 23.358461
+    ladoCostado: 23.358461
+  - prefab: {fileID: 6760522251359393831, guid: 37a735c1f8f8cfe4996a808197217a49, type: 3}
+    uvFrente:
+      serializedVersion: 2
+      x: 0.00024414062
+      y: 0.00032552084
+      width: 0.24951172
+      height: 0.33268228
+    uvCostado:
+      serializedVersion: 2
+      x: 0.25024414
+      y: 0.00032552084
+      width: 0.24951172
+      height: 0.33268228
+    centro: {x: -1.9124148, y: 11.788198, z: 2.0718913}
+    ladoFrente: 24.519451
+    ladoCostado: 24.519451
+  - prefab: {fileID: 8846996692718030931, guid: a0bfa1e73685a1d41a0759b1915a9f0c, type: 3}
+    uvFrente:
+      serializedVersion: 2
+      x: 0.50024414
+      y: 0.00032552084
+      width: 0.24951172
+      height: 0.33268228
+    uvCostado:
+      serializedVersion: 2
+      x: 0.75024414
+      y: 0.00032552084
+      width: 0.24951172
+      height: 0.33268228
+    centro: {x: 0.9465339, y: 5.996939, z: 1.2899749}
+    ladoFrente: 12.474415
+    ladoCostado: 12.474415

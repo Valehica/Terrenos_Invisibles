@@ -7,16 +7,15 @@ using UnityEngine;
 //   splat.bin   -> alphamaps
 //   fondo.bin   -> malla de MontanasLejanas (FondoSur.asset)
 // y actualiza lo que depende del tamano del terreno:
-//   TerrainHeight_Sur.asset (el _ShoreHeightMap del agua) y el origen/tamano en
-//   el material del mar, y la malla del mar (OceanGrid_Sur.asset).
+//   la malla del mar (OceanGrid_Sur.asset). El agua (Terrenos/Mar) saca la orilla
+//   del depth buffer, asi que no hay nada que bakear para ella.
 //
 // Orden completo: gen_landcover.py, gen_terrain.py, gen_fondo.py, este menu,
-// Terrenos > Agua > Bakear distancia a la costa, Terrenos > Sur > Poblar vegetacion.
+// Terrenos > Sur > Poblar vegetacion.
 public static class AplicarTerrenoSur
 {
     const string Carpeta = "Tools/TerrenoSur";
     const float Base = -90f, Rango = 420f;   // igual que BASE_Y / RANGE_Y de gen_terrain.py
-    const string RutaHeightAgua = "Assets/Textures/TerrainHeight_Sur.asset";
     const string RutaFondo = "Assets/Meshes/FondoSur.asset";
     const string RutaMar = "Assets/Meshes/OceanGrid_Sur.asset";
 
@@ -68,35 +67,11 @@ public static class AplicarTerrenoSur
         td.SetDetailResolution(ares, 32);
         EditorUtility.SetDirty(td);
 
-        ActualizarAgua(terrain);
         ConstruirFondo();
         ConstruirMar();
         AssetDatabase.SaveAssets();
         Debug.Log($"Terreno de Sur aplicado: {2 * Mitad} m, heightmap {res}, splat {ares}. " +
-                  "Falta: Bakear distancia a la costa y Poblar vegetacion.");
-    }
-
-    static void ActualizarAgua(Terrain terrain)
-    {
-        var td = terrain.terrainData;
-        var tex = AssetDatabase.LoadAssetAtPath<Texture2D>(RutaHeightAgua);
-        int n = td.alphamapResolution;   // un texel por celda de splat: 1.56 m
-        if (tex.width != n) tex.Reinitialize(n, n, TextureFormat.RFloat, false);
-        var px = new Color[n * n];
-        for (int z = 0; z < n; z++)
-            for (int x = 0; x < n; x++)
-                px[z * n + x] = new Color(td.GetInterpolatedHeight((x + 0.5f) / n, (z + 0.5f) / n) + terrain.transform.position.y, 0, 0, 1);
-        tex.SetPixels(px);
-        tex.Apply(false, false);
-        EditorUtility.SetDirty(tex);
-
-        var sea = GameObject.Find("Sea");
-        if (sea == null) return;
-        var mat = sea.GetComponent<MeshRenderer>().sharedMaterial;
-        Undo.RecordObject(mat, "Agua de Sur");
-        mat.SetVector("_ShoreMapOrigin", new Vector4(-Mitad, -Mitad, 0, 0));
-        mat.SetVector("_ShoreMapSize", new Vector4(2 * Mitad, 2 * Mitad, 0, 0));
-        EditorUtility.SetDirty(mat);
+                  "Falta: Poblar vegetacion.");
     }
 
     static void ConstruirFondo()
