@@ -1,13 +1,8 @@
-// Billboards del bosque lejano (BosqueLejano.cs). Cada arbol son dos cuadros cruzados con su foto, horneada
-// sin luz por Assets/Editor/ArbolesLodSur.cs; aca se ilumina con el sol y el ambiente.
+// Arboles lejanos de Sur (Arbol_*_Lejos.prefab): dos cuadros cruzados con la foto del arbol de frente y de
+// costado, horneada sin luz por Assets/Editor/ArbolesLejanosSur.cs; aca se ilumina con el sol y el ambiente.
 //
-// TEXCOORD1 = (punto de referencia del LODGroup del arbol en mundo, distancia a la que ese LODGroup se apaga),
-// calculado por BosqueLejano. Mas cerca que eso los cuatro vertices del cuadro se juntan en un punto y no se
-// dibuja: ahi el Terrain dibuja el arbol de verdad. Los arboles que solo existen como billboard (lejos de la
-// zona que recorre el jugador) llevan distancia 0: siempre se dibujan.
-//
-// La normal es hacia arriba (la pone BosqueLejano): con la del cuadro, la cara que no mira al sol sale negra.
-// Por eso la luz va con wrap, como el follaje de la Queñoa.
+// La normal es hacia arriba (la pone ArbolesLejanosSur): con la del cuadro, la cara que no mira al sol sale
+// negra. Por eso la luz va con wrap, como el follaje de la Queñoa.
 Shader "Terrenos/ArbolBillboard"
 {
     Properties
@@ -37,14 +32,6 @@ Shader "Terrenos/ArbolBillboard"
 
         TEXTURE2D(_BaseMap); SAMPLER(sampler_BaseMap);
 
-        // Posicion de clip, o un punto degenerado si el arbol de verdad todavia se dibuja.
-        float4 PosicionBillboard(float3 positionOS, float4 refCorte)
-        {
-            float3 ws = TransformObjectToWorld(positionOS);
-            float d = distance(refCorte.xyz, _WorldSpaceCameraPos.xyz);
-            return d < refCorte.w ? float4(0, 0, 0, 1) : TransformWorldToHClip(ws);
-        }
-
         void Recorte(float2 uv)
         {
             clip(SAMPLE_TEXTURE2D(_BaseMap, sampler_BaseMap, uv).a - _Cutoff);
@@ -60,6 +47,7 @@ Shader "Terrenos/ArbolBillboard"
             #pragma vertex vert
             #pragma fragment frag
             #pragma target 3.0
+            #pragma multi_compile_instancing
             #pragma multi_compile_fragment _ _SCREEN_SPACE_OCCLUSION
             #pragma multi_compile_fog
 
@@ -70,8 +58,7 @@ Shader "Terrenos/ArbolBillboard"
                 float4 positionOS : POSITION;
                 float3 normalOS   : NORMAL;
                 float2 uv         : TEXCOORD0;
-                float4 pie        : TEXCOORD1;
-                half4  color      : COLOR;
+                UNITY_VERTEX_INPUT_INSTANCE_ID
             };
 
             struct Varyings
@@ -79,17 +66,16 @@ Shader "Terrenos/ArbolBillboard"
                 float4 positionCS : SV_POSITION;
                 float2 uv         : TEXCOORD0;
                 float3 normalWS   : TEXCOORD1;
-                half3  color      : TEXCOORD2;
-                half   fog        : TEXCOORD3;
+                half   fog        : TEXCOORD2;
             };
 
             Varyings vert(Attributes v)
             {
                 Varyings o = (Varyings)0;
-                o.positionCS = PosicionBillboard(v.positionOS.xyz, v.pie);
+                UNITY_SETUP_INSTANCE_ID(v);
+                o.positionCS = TransformObjectToHClip(v.positionOS.xyz);
                 o.uv = v.uv;
                 o.normalWS = TransformObjectToWorldNormal(v.normalOS);
-                o.color = v.color.rgb;
                 o.fog = ComputeFogFactor(o.positionCS.z);
                 return o;
             }
@@ -99,7 +85,7 @@ Shader "Terrenos/ArbolBillboard"
                 half4 tex = SAMPLE_TEXTURE2D(_BaseMap, sampler_BaseMap, i.uv);
                 clip(tex.a - _Cutoff);
                 float3 n = normalize(i.normalWS);
-                half3 albedo = tex.rgb * i.color * _Tinte.rgb * _Brillo;
+                half3 albedo = tex.rgb * _Tinte.rgb * _Brillo;
 
                 Light L = GetMainLight();
                 half difusa = saturate((dot(n, L.direction) + _Wrap) / (1.0 + _Wrap));
@@ -126,14 +112,16 @@ Shader "Terrenos/ArbolBillboard"
             HLSLPROGRAM
             #pragma vertex vertD
             #pragma fragment fragD
+            #pragma multi_compile_instancing
 
-            struct A { float4 positionOS : POSITION; float2 uv : TEXCOORD0; float4 pie : TEXCOORD1; };
+            struct A { float4 positionOS : POSITION; float2 uv : TEXCOORD0; UNITY_VERTEX_INPUT_INSTANCE_ID };
             struct V { float4 positionCS : SV_POSITION; float2 uv : TEXCOORD0; };
 
             V vertD(A v)
             {
                 V o;
-                o.positionCS = PosicionBillboard(v.positionOS.xyz, v.pie);
+                UNITY_SETUP_INSTANCE_ID(v);
+                o.positionCS = TransformObjectToHClip(v.positionOS.xyz);
                 o.uv = v.uv;
                 return o;
             }
@@ -153,14 +141,16 @@ Shader "Terrenos/ArbolBillboard"
             HLSLPROGRAM
             #pragma vertex vertN
             #pragma fragment fragN
+            #pragma multi_compile_instancing
 
-            struct A { float4 positionOS : POSITION; float3 normalOS : NORMAL; float2 uv : TEXCOORD0; float4 pie : TEXCOORD1; };
+            struct A { float4 positionOS : POSITION; float3 normalOS : NORMAL; float2 uv : TEXCOORD0; UNITY_VERTEX_INPUT_INSTANCE_ID };
             struct V { float4 positionCS : SV_POSITION; float3 normalWS : TEXCOORD0; float2 uv : TEXCOORD1; };
 
             V vertN(A v)
             {
                 V o;
-                o.positionCS = PosicionBillboard(v.positionOS.xyz, v.pie);
+                UNITY_SETUP_INSTANCE_ID(v);
+                o.positionCS = TransformObjectToHClip(v.positionOS.xyz);
                 o.normalWS = TransformObjectToWorldNormal(v.normalOS);
                 o.uv = v.uv;
                 return o;

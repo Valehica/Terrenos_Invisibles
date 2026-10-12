@@ -79,8 +79,39 @@ public class AnimalScanner : MonoBehaviour
         Ray ray = new Ray(cam.transform.position, cam.transform.forward);
         float range = scanRange * Mathf.Clamp(ThirdPersonCameraController.ZoomFactor, 1f, maxZoomRangeMultiplier);
         if (Physics.Raycast(ray, out RaycastHit hit, range, scanMask, QueryTriggerInteraction.Collide))
+        {
+            if (hit.collider is TerrainCollider terrainCollider)
+                return TerrainTreeScannable(terrainCollider, hit.point);
             return hit.collider.GetComponentInParent<Scannable>();
+        }
         return null;
+    }
+
+    // Terrain trees have no GameObject: a hit on a tree's collider reports the TerrainCollider. If the hit is
+    // above the ground it was a tree, and the nearest instance gives its prototype, whose prefab carries the
+    // Scannable.
+    private static Scannable TerrainTreeScannable(TerrainCollider terrainCollider, Vector3 point)
+    {
+        Terrain terrain = terrainCollider.GetComponent<Terrain>();
+        if (terrain == null) return null;
+        Vector3 origin = terrain.transform.position;
+        if (point.y - (terrain.SampleHeight(point) + origin.y) < 0.15f) return null;
+
+        TerrainData data = terrain.terrainData;
+        int nearest = -1;
+        float nearestSqr = 9f; // the hit is on the trunk's capsule: within 3 m of the instance
+        for (int i = 0; i < data.treeInstanceCount; i++)
+        {
+            TreeInstance tree = data.GetTreeInstance(i);
+            Vector3 p = Vector3.Scale(tree.position, data.size) + origin;
+            float dx = p.x - point.x, dz = p.z - point.z;
+            float sqr = dx * dx + dz * dz;
+            if (sqr < nearestSqr) { nearestSqr = sqr; nearest = i; }
+        }
+        if (nearest < 0) return null;
+
+        GameObject prefab = data.treePrototypes[data.GetTreeInstance(nearest).prototypeIndex].prefab;
+        return prefab != null ? prefab.GetComponent<Scannable>() : null;
     }
 
     private void OpenPanel(Scannable target)

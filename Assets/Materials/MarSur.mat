@@ -20,7 +20,7 @@ Material:
   m_CustomRenderQueue: -1
   stringTagMap: {}
   disabledShaderPasses: []
-  m_LockedProperties: 
+  m_LockedProperties: _Brillo
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
@@ -34,9 +34,9 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _BordeSuave: 0.06
+    - _BordeSuave: 0.08
     - _Brillo: 350
-    - _BrilloCuerpo: 0.4
+    - _BrilloCuerpo: 0.33
     - _BrilloIntensidad: 1.8
     - _Causticas: 1
     - _CausticasEscala: 0.28
@@ -47,34 +47,34 @@ Material:
     - _DestellosEscala: 0.35
     - _DestellosIntensidad: 5
     - _DestellosPotencia: 90
-    - _EspumaAncho: 0.18
+    - _EspumaAncho: 0.5
     - _EspumaRuidoEscala: 0.09
-    - _FresnelMax: 0.8
+    - _FresnelMax: 0.334
     - _FresnelMin: 0.03
-    - _FresnelPotencia: 4
-    - _LineasAlcance: 1.4
+    - _FresnelPotencia: 6.52
+    - _LineasAlcance: 1.93
     - _LineasFrecuencia: 1.6
     - _LineasGrosor: 0.14
     - _LineasVelocidad: 0.22
-    - _MezclaCieloSH: 0.3
+    - _MezclaCieloSH: 0.808
     - _OndasDistancia: 220
-    - _OndasEscala: 0.045
-    - _OndasFuerza: 0.3
+    - _OndasEscala: 0.02
+    - _OndasFuerza: 0.15
     - _OndasVelocidad: 0.7
-    - _ProfundidadMedia: 2.5
+    - _ProfundidadMedia: 3.38
     - _ProfundidadPlena: 16
-    - _Refraccion: 0.025
-    - _VelocidadOlas: 1
+    - _Refraccion: 0.041
+    - _VelocidadOlas: 2
     m_Colors:
     - _ColorCenit: {r: 0.35999998, g: 0.62, b: 0.92, a: 1}
     - _ColorEspuma: {r: 1, g: 1, b: 1, a: 0.95}
     - _ColorHorizonte: {r: 0.78, g: 0.9, b: 0.96, a: 1}
-    - _ColorMedio: {r: 0.08, g: 0.47, b: 0.62, a: 1}
-    - _ColorProfundo: {r: 0.04, g: 0.23, b: 0.42, a: 1}
-    - _ColorSomero: {r: 0.29999998, g: 0.86, b: 0.8, a: 1}
+    - _ColorMedio: {r: 0.08595381, g: 0.3973808, b: 0.51572317, a: 1}
+    - _ColorProfundo: {r: 0.032692503, g: 0.1972709, b: 0.3584906, a: 1}
+    - _ColorSomero: {r: 0.2875874, g: 0.6454274, b: 0.8238993, a: 1}
     - _OlaA: {r: 0.25, g: 1, b: 0.012, a: 140}
     - _OlaB: {r: -0.45, g: 1, b: 0.0108, a: 96}
     - _OlaC: {r: 0.7, g: 1, b: 0.0072000003, a: 70}
-    - _TinteFondo: {r: 0.54999995, g: 0.95, b: 0.9, a: 1}
+    - _TinteFondo: {r: 0.22540632, g: 0.72394824, b: 0.8238993, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1

@@ -1,0 +1,171 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &5301944398885259923
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3844005152766465438}
+  - component: {fileID: 7847395646729292967}
+  - component: {fileID: 6523936967089439839}
+  - component: {fileID: 452537641751058399}
+  m_Layer: 0
+  m_Name: Arbol_CoiguePeque
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3844005152766465438
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5301944398885259923}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 7963731498375951608}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!136 &7847395646729292967
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5301944398885259923}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.93234867
+  m_Height: 8
+  m_Direction: 1
+  m_Center: {x: 0, y: 3.6878326, z: 0}
+--- !u!114 &6523936967089439839
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5301944398885259923}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9155d463758dc6249a1662498a3650f0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  speciesId: coigue
+  displayName: "Coig\xFCe de Magallanes"
+  scientificName: Nothofagus betuloides
+  description: "\xC1rbol siempreverde que domina los bosques h\xFAmedos de los canales
+    patag\xF3nicos. Sus hojas peque\xF1as, gruesas y de borde aserrado resisten el
+    viento y la lluvia casi constante de la zona, y puede superar los 25 metros de
+    altura. Los kaw\xE9sqar usaban su corteza para fabricar sus canoas tradicionales."
+--- !u!205 &452537641751058399
+LODGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5301944398885259923}
+  serializedVersion: 2
+  m_LocalReferencePoint: {x: -1.0147357, y: 10.744816, z: -0.8258858}
+  m_Size: 22.113968
+  m_FadeMode: 0
+  m_AnimateCrossFading: 0
+  m_LastLODIsBillboard: 0
+  m_LODs:
+  - screenRelativeHeight: 0.012
+    fadeTransitionWidth: 0
+    renderers:
+    - renderer: {fileID: 6686654067294082647}
+    - renderer: {fileID: 7293401436202603366}
+  m_Enabled: 1
+--- !u!1001 &7570096771590050579
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 3844005152766465438}
+    m_Modifications:
+    - target: {fileID: -8679921383154817045, guid: e2a61d8adc761234aae952456b28af0c, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -0.0112325065
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: e2a61d8adc761234aae952456b28af0c, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: e2a61d8adc761234aae952456b28af0c, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 12.145578
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: e2a61d8adc761234aae952456b28af0c, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: e2a61d8adc761234aae952456b28af0c, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: e2a61d8adc761234aae952456b28af0c, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: e2a61d8adc761234aae952456b28af0c, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: e2a61d8adc761234aae952456b28af0c, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: e2a61d8adc761234aae952456b28af0c, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: e2a61d8adc761234aae952456b28af0c, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: e2a61d8adc761234aae952456b28af0c, type: 3}
+      propertyPath: m_Name
+      value: CoiguePeque
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: e2a61d8adc761234aae952456b28af0c, type: 3}
+--- !u!23 &6686654067294082647 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: -5348685820447898300, guid: e2a61d8adc761234aae952456b28af0c, type: 3}
+  m_PrefabInstance: {fileID: 7570096771590050579}
+  m_PrefabAsset: {fileID: 0}
+--- !u!23 &7293401436202603366 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 880804544523190389, guid: e2a61d8adc761234aae952456b28af0c, type: 3}
+  m_PrefabInstance: {fileID: 7570096771590050579}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &7963731498375951608 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: e2a61d8adc761234aae952456b28af0c, type: 3}
+  m_PrefabInstance: {fileID: 7570096771590050579}
+  m_PrefabAsset: {fileID: 0}

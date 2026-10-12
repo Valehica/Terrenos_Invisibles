@@ -49,7 +49,7 @@ Material:
     - _DestellosPotencia: 90
     - _EspumaAncho: 0.18
     - _EspumaRuidoEscala: 0.09
-    - _FresnelMax: 0.8
+    - _FresnelMax: 0.646
     - _FresnelMin: 0.03
     - _FresnelPotencia: 4
     - _LineasAlcance: 1.4
@@ -66,15 +66,15 @@ Material:
     - _Refraccion: 0.025
     - _VelocidadOlas: 1
     m_Colors:
-    - _ColorCenit: {r: 0.35999998, g: 0.62, b: 0.92, a: 1}
+    - _ColorCenit: {r: 0.25293687, g: 0.5629024, b: 0.9245283, a: 1}
     - _ColorEspuma: {r: 1, g: 1, b: 1, a: 0.95}
     - _ColorHorizonte: {r: 0.78, g: 0.9, b: 0.96, a: 1}
-    - _ColorMedio: {r: 0.1, g: 0.55, b: 0.74, a: 1}
-    - _ColorProfundo: {r: 0.05, g: 0.27, b: 0.52, a: 1}
-    - _ColorSomero: {r: 0.29999998, g: 0.86, b: 0.8, a: 1}
+    - _ColorMedio: {r: 0.16019925, g: 0.5241645, b: 0.6792453, a: 1}
+    - _ColorProfundo: {r: 0.020291876, g: 0.12254209, b: 0.23899364, a: 1}
+    - _ColorSomero: {r: 0.2800719, g: 0.65743965, b: 0.7484276, a: 1}
     - _OlaA: {r: 0.25, g: 1, b: 0.02, a: 140}
     - _OlaB: {r: -0.45, g: 1, b: 0.018, a: 96}
     - _OlaC: {r: 0.7, g: 1, b: 0.012, a: 70}
-    - _TinteFondo: {r: 0.54999995, g: 0.95, b: 0.9, a: 1}
+    - _TinteFondo: {r: 0.32656926, g: 0.67629063, b: 0.8050314, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
