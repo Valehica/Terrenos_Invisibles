@@ -36,6 +36,6 @@ Material:
     - _OverBright: 3
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
-    - _TintColor: {r: 0.94340473, g: 1.0885439, b: 1.0885439, a: 0.12}
+    - _TintColor: {r: 0.9678031, g: 1.116696, b: 1.116696, a: 0.12}
   m_BuildTextureStacks: []
   m_AllowLocking: 1

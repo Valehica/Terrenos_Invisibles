@@ -58,10 +58,10 @@ public class ArbolesCoigueCipresSur : AssetPostprocessor
             var mat = r.sharedMaterial;
             var mf = r.GetComponent<MeshFilter>();
             if (mat == null || mf == null || mf.sharedMesh == null) continue;
-            if (!mat.name.StartsWith("M_Corteza")) continue;
-            UvBox(mf.sharedMesh);
+            if (!EsCorteza(mat)) continue;
+            UvBox(mf.sharedMesh, EscalaMapping);
         }
-        DatosViento(raiz);
+        DatosViento(raiz, EsCorteza);
     }
 
     // ---------------------------------------------------------------- datos de viento (color de vertice)
@@ -72,7 +72,10 @@ public class ArbolesCoigueCipresSur : AssetPostprocessor
     // raiz del CipreGrande tiene escala 1.6), asi las alturas son metros reales.
     const float AlturaViento = 40f, RadioViento = 15f;
 
-    static void DatosViento(GameObject raiz)
+    static bool EsCorteza(Material m) => m != null && m.name.StartsWith("M_Corteza");
+
+    // Tambien la usa ArbolesArrayanOlivillo, con su propio criterio de que material es corteza.
+    internal static void DatosViento(GameObject raiz, System.Func<Material, bool> esCorteza)
     {
         var rs = raiz.GetComponentsInChildren<MeshRenderer>(true);
 
@@ -81,7 +84,7 @@ public class ArbolesCoigueCipresSur : AssetPostprocessor
         var corteza = new List<Vector3>();
         foreach (var r in rs)
         {
-            if (r.sharedMaterial == null || !r.sharedMaterial.name.StartsWith("M_Corteza")) continue;
+            if (!esCorteza(r.sharedMaterial)) continue;
             var m = r.transform.localToWorldMatrix;
             foreach (var v in r.GetComponent<MeshFilter>().sharedMesh.vertices)
             {
@@ -100,7 +103,7 @@ public class ArbolesCoigueCipresSur : AssetPostprocessor
             var mf = r.GetComponent<MeshFilter>();
             if (mf == null || mf.sharedMesh == null) continue;
             var mesh = mf.sharedMesh;
-            bool hojas = r.sharedMaterial == null || !r.sharedMaterial.name.StartsWith("M_Corteza");
+            bool hojas = !esCorteza(r.sharedMaterial);
             var m = r.transform.localToWorldMatrix;
             var vs = mesh.vertices;
             var fase = hojas ? FasePorTarjeta(mesh) : null;
@@ -154,7 +157,7 @@ public class ArbolesCoigueCipresSur : AssetPostprocessor
         }
     }
 
-    static void UvBox(Mesh mesh)
+    internal static void UvBox(Mesh mesh, Vector3 escalaMapping)
     {
         var pos = new List<Vector3>(); mesh.GetVertices(pos);
         var nor = new List<Vector3>(); mesh.GetNormals(nor);
@@ -188,7 +191,7 @@ public class ArbolesCoigueCipresSur : AssetPostprocessor
                         mapa[clave] = nv;
                         nPos.Add(pos[v]);
                         nNor.Add(nor[v]);
-                        Vector3 co = Vector3.Scale(ABlender(pos[v]), EscalaMapping);
+                        Vector3 co = Vector3.Scale(ABlender(pos[v]), escalaMapping);
                         nUv.Add(UvEje(co, n, eje));
                     }
                     nuevos[t + k] = nv;
@@ -213,7 +216,7 @@ public class ArbolesCoigueCipresSur : AssetPostprocessor
     // El Terrain, con un FBX comun como prototipo, dibuja SOLO la malla de la raiz (las hojas son hijos y no
     // salian) y de lejos lo cambia por un billboard propio que en URP sale azul. Con un LODGroup en el prefab
     // dibuja todos los renderers y no hace billboard; el corte de lejos lo hace el LODGroup.
-    const float CorteLod = 0.012f;   // alto relativo en pantalla (con lodBias 2): un arbol de 25 m se apaga a ~3.6 km
+    internal const float CorteLod = 0.012f;   // alto relativo en pantalla (con lodBias 2): un arbol de 25 m se apaga a ~3.6 km
 
     // Datos del escaneo con el telefono (Scannable). Los textos son un primer borrador: revisarlos.
     class Especie { public string id, nombre, cientifico, descripcion; }
@@ -311,7 +314,7 @@ public class ArbolesCoigueCipresSur : AssetPostprocessor
     // Capsula vertical sobre el tronco, 8 m de alto para que el rayo del telefono le pegue aunque se mire un poco hacia arriba.
     const float AltoCollider = 8f;
 
-    static CapsuleCollider ColliderTronco(GameObject raiz, MeshRenderer tronco)
+    internal static CapsuleCollider ColliderTronco(GameObject raiz, MeshRenderer tronco)
     {
         var mesh = tronco.GetComponent<MeshFilter>().sharedMesh;
         var m = raiz.transform.worldToLocalMatrix * tronco.transform.localToWorldMatrix;

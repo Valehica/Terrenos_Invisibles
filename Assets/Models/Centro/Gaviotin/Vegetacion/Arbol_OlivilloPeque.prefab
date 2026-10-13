@@ -1,0 +1,151 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &2297028757677496696
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7043611774986308792}
+  - component: {fileID: 3265283941288702010}
+  - component: {fileID: 6706278294693105413}
+  m_Layer: 0
+  m_Name: Arbol_OlivilloPeque
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7043611774986308792
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2297028757677496696}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 3801069655045220719}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!136 &3265283941288702010
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2297028757677496696}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.7609159
+  m_Height: 8
+  m_Direction: 1
+  m_Center: {x: 0, y: 4, z: 0}
+--- !u!205 &6706278294693105413
+LODGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2297028757677496696}
+  serializedVersion: 2
+  m_LocalReferencePoint: {x: 0.7472153, y: 9.770217, z: 0.5840559}
+  m_Size: 19.540434
+  m_FadeMode: 0
+  m_AnimateCrossFading: 0
+  m_LastLODIsBillboard: 0
+  m_LODs:
+  - screenRelativeHeight: 0.012
+    fadeTransitionWidth: 0
+    renderers:
+    - renderer: {fileID: 8607322404869337487}
+    - renderer: {fileID: 4077895225439388253}
+  m_Enabled: 1
+--- !u!1001 &3695948736141315716
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 7043611774986308792}
+    m_Modifications:
+    - target: {fileID: -8679921383154817045, guid: eecfa3a5305ffc346a8fa79b0639fa52, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -0.003578614
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: eecfa3a5305ffc346a8fa79b0639fa52, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.9820485
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: eecfa3a5305ffc346a8fa79b0639fa52, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0.0732291
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: eecfa3a5305ffc346a8fa79b0639fa52, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: eecfa3a5305ffc346a8fa79b0639fa52, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: eecfa3a5305ffc346a8fa79b0639fa52, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: eecfa3a5305ffc346a8fa79b0639fa52, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: eecfa3a5305ffc346a8fa79b0639fa52, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: eecfa3a5305ffc346a8fa79b0639fa52, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: eecfa3a5305ffc346a8fa79b0639fa52, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: eecfa3a5305ffc346a8fa79b0639fa52, type: 3}
+      propertyPath: m_Name
+      value: OlivilloPeque
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: eecfa3a5305ffc346a8fa79b0639fa52, type: 3}
+--- !u!4 &3801069655045220719 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: eecfa3a5305ffc346a8fa79b0639fa52, type: 3}
+  m_PrefabInstance: {fileID: 3695948736141315716}
+  m_PrefabAsset: {fileID: 0}
+--- !u!23 &4077895225439388253 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 854907472971975897, guid: eecfa3a5305ffc346a8fa79b0639fa52, type: 3}
+  m_PrefabInstance: {fileID: 3695948736141315716}
+  m_PrefabAsset: {fileID: 0}
+--- !u!23 &8607322404869337487 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: -4307130280243708149, guid: eecfa3a5305ffc346a8fa79b0639fa52, type: 3}
+  m_PrefabInstance: {fileID: 3695948736141315716}
+  m_PrefabAsset: {fileID: 0}
