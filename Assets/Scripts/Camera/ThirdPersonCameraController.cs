@@ -62,6 +62,7 @@ private void Start()
     {
         yaw = transform.eulerAngles.y;
         pitch = startPitch;
+        collisionMask = LimiteJugable.MascaraSin(collisionMask); // las paredes invisibles no empujan la camara
         SetCursorLocked(true);
 
         cam = GetComponent<Camera>();

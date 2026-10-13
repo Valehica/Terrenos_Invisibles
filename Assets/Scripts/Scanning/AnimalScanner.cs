@@ -29,6 +29,7 @@ public class AnimalScanner : MonoBehaviour
     private void Awake()
     {
         cam = GetComponent<Camera>();
+        scanMask = LimiteJugable.MascaraSin(scanMask); // se escanea a traves de las paredes invisibles
         SetScanUIVisible(false);
         if (descriptionPanel != null)
             descriptionPanel.SetActive(false);

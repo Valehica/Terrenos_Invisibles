@@ -158,6 +158,7 @@ public class GaviotinBehavior : MonoBehaviour
 
     private void Start()
     {
+        capasSuelo = LimiteJugable.MascaraSin(capasSuelo); // no posarse sobre las paredes invisibles
         animator = GetComponentInChildren<Animator>();
         if (animator != null)
         {
