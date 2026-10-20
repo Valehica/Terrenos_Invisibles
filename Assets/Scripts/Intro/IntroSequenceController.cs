@@ -46,7 +46,15 @@ public class IntroSequenceController : MonoBehaviour
     [SerializeField] private float segundosPorAnimacion = 2f;
     [SerializeField] private float framesPorSegundo = 8f;
 
+    [Header("Al terminar")]
+    [Tooltip("Escena que se carga al terminar, pasando por la pantalla de carga. Vacío = solo se oculta el panel.")]
+    [SerializeField] private string escenaSiguiente = "";
+    [SerializeField] private string tituloCarga = "";
+    [TextArea(2, 4)]
+    [SerializeField] private string datoCarga = "";
+
     private float animTime;
+    private bool terminado;
 
     private int blockIndex = -1;
     private bool isTyping;
@@ -149,7 +157,22 @@ public class IntroSequenceController : MonoBehaviour
 
     private void EndIntro()
     {
+        if (terminado) return;
+        terminado = true;
+
+        if (!string.IsNullOrEmpty(escenaSiguiente))
+        {
+            // El panel queda en negro hasta que entra la pantalla de carga.
+            CargadorEscenas.Ir(escenaSiguiente, tituloCarga, datoCarga);
+            return;
+        }
+
         IsPlaying = false;
         if (introPanel != null) introPanel.SetActive(false);
+    }
+
+    private void OnDestroy()
+    {
+        IsPlaying = false;
     }
 }
