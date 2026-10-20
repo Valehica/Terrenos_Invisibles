@@ -6,7 +6,8 @@ using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 
-// Version lejana de los coigues y cipreses de Sur, para el bosque que el jugador ve pero no alcanza:
+// Version lejana de los coigues y cipreses de Sur (y de los arrayanes y olivillos de Centro, ver
+// ArbolesArrayanOlivillo), para el bosque que el jugador ve pero no alcanza:
 // Arbol_<nombre>_Lejos.prefab = dos cuadros cruzados (frente y costado) con la foto del arbol de verdad,
 // sin collider ni Scannable. Se pintan en el Terrain como cualquier arbol (los agrega el menu
 // Terrenos > Sur > Arboles coigue y cipres al Terrain, que llama a Crear).
@@ -14,25 +15,29 @@ using UnityEngine.Rendering.Universal;
 // Las fotos se sacan con camara ortografica y materiales Unlit (sin luz: la pone el shader
 // Terrenos/ArbolBillboard en el juego). Durante la foto se apagan los efectos del renderer (SSAO, rayos,
 // pase de estilo) y la niebla, y se restauran al terminar. Todas van a un atlas comun, asi los lejanos
-// comparten un solo material.
+// comparten un solo material (uno por carpeta: Sur y Centro tienen cada una su atlas).
 //
 // Llevan LODGroup aunque tengan un solo nivel: sin el, el Terrain cambia el arbol por su propio billboard
 // pasados treeBillboardDistance, y en URP sale azul.
 public static class ArbolesLejanosSur
 {
-    const string Carpeta = "Assets/Models/Sur/Vegetacion";
-    const string RutaAtlas = Carpeta + "/Arboles_Lejos_Atlas.png";
-    const string RutaMaterial = Carpeta + "/Materials/M_Arboles_Lejos.mat";
+    const string CarpetaSur = "Assets/Models/Sur/Vegetacion";
     const int Celda = 512;                 // pixeles por vista
     const int Columnas = 4;
     const float CorteLod = 0.002f;         // con lodBias 2, un arbol de 25 m se apaga a ~20 km: siempre visible
 
-    public static List<GameObject> Crear(List<(string nombre, GameObject prefab)> arboles)
+    public static List<GameObject> Crear(List<(string nombre, GameObject prefab)> arboles) => Crear(arboles, CarpetaSur, 1f);
+
+    // Atlas, material, mallas y prefabs quedan en la carpeta (el material en <carpeta>/Materials).
+    // tonoCorteza multiplica el color de los materiales sin recorte (la corteza) en la foto: el shader de los
+    // lejanos ilumina con la normal hacia arriba, y un tronco bajo la copa recibe mucha menos luz que eso.
+    public static List<GameObject> Crear(List<(string nombre, GameObject prefab)> arboles, string carpeta, float tonoCorteza)
     {
+        string rutaAtlas = carpeta + "/Arboles_Lejos_Atlas.png";
         int filas = Mathf.CeilToInt(arboles.Count * 2 / (float)Columnas);
         var atlas = new Texture2D(Columnas * Celda, filas * Celda, TextureFormat.RGBA32, false, false);
         atlas.SetPixels32(new Color32[atlas.width * atlas.height]);
-        var mat = Material();
+        var mat = Material(carpeta + "/Materials/M_Arboles_Lejos.mat");
         var mallas = new List<(string nombre, Mesh mesh)>();
 
         const int capa = 31;
@@ -69,7 +74,7 @@ public static class ArbolesLejanosSur
                 {
                     r.gameObject.layer = capa;
                     var unlit = new Material[r.sharedMaterials.Length];
-                    for (int i = 0; i < unlit.Length; i++) { unlit[i] = SinLuz(r.sharedMaterials[i]); temporales.Add(unlit[i]); }
+                    for (int i = 0; i < unlit.Length; i++) { unlit[i] = SinLuz(r.sharedMaterials[i], tonoCorteza); temporales.Add(unlit[i]); }
                     r.sharedMaterials = unlit;
                     if (primero) { b = r.bounds; primero = false; } else b.Encapsulate(r.bounds);
                 }
@@ -97,7 +102,7 @@ public static class ArbolesLejanosSur
                                             (Celda - 1f) / atlas.width, (Celda - 1f) / atlas.height);
                     lados[vista] = lado;
                 }
-                mallas.Add((arboles[k].nombre, Malla(arboles[k].nombre, b.center, lados, rects)));
+                mallas.Add((arboles[k].nombre, Malla(carpeta, arboles[k].nombre, b.center, lados, rects)));
 
                 Object.DestroyImmediate(go);
                 foreach (var m in temporales) Object.DestroyImmediate(m);
@@ -114,10 +119,10 @@ public static class ArbolesLejanosSur
         }
 
         Dilatar(atlas, 12);
-        File.WriteAllBytes(RutaAtlas, atlas.EncodeToPNG());
+        File.WriteAllBytes(rutaAtlas, atlas.EncodeToPNG());
         Object.DestroyImmediate(atlas);
-        AssetDatabase.ImportAsset(RutaAtlas);
-        var ti = (TextureImporter)AssetImporter.GetAtPath(RutaAtlas);
+        AssetDatabase.ImportAsset(rutaAtlas);
+        var ti = (TextureImporter)AssetImporter.GetAtPath(rutaAtlas);
         ti.textureType = TextureImporterType.Default;
         ti.sRGBTexture = true;
         ti.alphaIsTransparency = true;
@@ -127,18 +132,18 @@ public static class ArbolesLejanosSur
         ti.wrapMode = TextureWrapMode.Clamp;
         ti.maxTextureSize = 2048;
         ti.SaveAndReimport();
-        mat.SetTexture("_BaseMap", AssetDatabase.LoadAssetAtPath<Texture2D>(RutaAtlas));
+        mat.SetTexture("_BaseMap", AssetDatabase.LoadAssetAtPath<Texture2D>(rutaAtlas));
         EditorUtility.SetDirty(mat);
 
         var prefabs = new List<GameObject>();
-        foreach (var (nombre, mesh) in mallas) prefabs.Add(Prefab(nombre, mesh, mat));
+        foreach (var (nombre, mesh) in mallas) prefabs.Add(Prefab(carpeta, nombre, mesh, mat));
         AssetDatabase.SaveAssets();
         return prefabs;
     }
 
     // Dos cuadros cruzados en el centro de la caja del arbol. Normal hacia arriba en todos los vertices
     // (ver el shader). Vista 0 = camara mirando +Z (derecha = +X); vista 1 = mirando +X (derecha = -Z).
-    static Mesh Malla(string nombre, Vector3 c, float[] lados, Rect[] rects)
+    static Mesh Malla(string carpeta, string nombre, Vector3 c, float[] lados, Rect[] rects)
     {
         var v = new List<Vector3>(); var uv = new List<Vector2>(); var tri = new List<int>();
         for (int vista = 0; vista < 2; vista++)
@@ -156,7 +161,7 @@ public static class ArbolesLejanosSur
             tri.AddRange(new[] { b0, b0 + 2, b0 + 1, b0, b0 + 3, b0 + 2 });
         }
 
-        string ruta = $"{Carpeta}/Arbol_{nombre}_Lejos_Malla.asset";
+        string ruta = $"{carpeta}/Arbol_{nombre}_Lejos_Malla.asset";
         var mesh = AssetDatabase.LoadAssetAtPath<Mesh>(ruta);
         bool nuevo = mesh == null;
         if (nuevo) mesh = new Mesh();
@@ -173,7 +178,7 @@ public static class ArbolesLejanosSur
         return mesh;
     }
 
-    static GameObject Prefab(string nombre, Mesh mesh, Material mat)
+    static GameObject Prefab(string carpeta, string nombre, Mesh mesh, Material mat)
     {
         var raiz = new GameObject($"Arbol_{nombre}_Lejos");
         var planos = new GameObject("Planos");
@@ -186,15 +191,15 @@ public static class ArbolesLejanosSur
         var lod = raiz.AddComponent<LODGroup>();
         lod.SetLODs(new[] { new LOD(CorteLod, new Renderer[] { r }) });
         lod.RecalculateBounds();
-        var prefab = PrefabUtility.SaveAsPrefabAsset(raiz, $"{Carpeta}/Arbol_{nombre}_Lejos.prefab");
+        var prefab = PrefabUtility.SaveAsPrefabAsset(raiz, $"{carpeta}/Arbol_{nombre}_Lejos.prefab");
         Object.DestroyImmediate(raiz);
         return prefab;
     }
 
-    static Material Material()
+    static Material Material(string ruta)
     {
-        var m = AssetDatabase.LoadAssetAtPath<Material>(RutaMaterial);
-        if (m == null) { m = new Material(Shader.Find("Terrenos/ArbolBillboard")); AssetDatabase.CreateAsset(m, RutaMaterial); }
+        var m = AssetDatabase.LoadAssetAtPath<Material>(ruta);
+        if (m == null) { m = new Material(Shader.Find("Terrenos/ArbolBillboard")); AssetDatabase.CreateAsset(m, ruta); }
         m.enableInstancing = true;
         return m;
     }
@@ -207,11 +212,13 @@ public static class ArbolesLejanosSur
     }
 
     // Copia URP/Unlit del material: misma textura, tinte y recorte, sin luz.
-    static Material SinLuz(Material lit)
+    static Material SinLuz(Material lit, float tonoCorteza)
     {
         var m = new Material(Shader.Find("Universal Render Pipeline/Unlit"));
         m.SetTexture("_BaseMap", lit.GetTexture("_BaseMap"));
-        m.SetColor("_BaseColor", lit.GetColor("_BaseColor"));
+        Color c = lit.GetColor("_BaseColor");
+        if (lit.GetFloat("_AlphaClip") < 0.5f) c = new Color(c.r * tonoCorteza, c.g * tonoCorteza, c.b * tonoCorteza, c.a);
+        m.SetColor("_BaseColor", c);
         m.SetFloat("_AlphaClip", lit.GetFloat("_AlphaClip"));
         m.SetFloat("_Cutoff", lit.GetFloat("_Cutoff"));
         m.SetFloat("_Cull", (float)CullMode.Off);

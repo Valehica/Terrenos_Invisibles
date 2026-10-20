@@ -19,11 +19,21 @@ using UnityEngine.Rendering;
 // Menu Terrenos > Centro > Materiales arrayan y olivillo: crea los materiales en Vegetacion/Materials y los
 // asigna a los cuatro FBX (remap), sin tocar el .blend.
 // Menu Terrenos > Centro > Arrayan y olivillo al Terrain: arma Arbol_*.prefab y los pone como prototipos.
+// Menu Terrenos > Centro > Arrayan y olivillo lejanos: hornea Arbol_*_Lejos.prefab para ArbolesVisibles.
 public class ArbolesArrayanOlivillo : AssetPostprocessor
 {
     const string Carpeta = "Assets/Models/Centro/Gaviotin/Vegetacion";
     const string CarpetaMat = Carpeta + "/Materials";
     static readonly string[] Modelos = { "ArrayanGrande", "ArrayanPeque", "OlivilloGrande", "OlivilloPeque" };
+    // Sueltos en la escena (no van al Terrain): solo UV Box, viento y materiales. ArrayanEspecial sale de
+    // Concept/Centro/Arboles/ArrayanEspecial.blend con los mismos materiales que el arrayan.
+    static readonly string[] Sueltos = { "Assets/Models/Sur/Vegetacion/ArrayanEspecial.fbx" };
+
+    static IEnumerable<string> RutasFbx()
+    {
+        foreach (var nombre in Modelos) yield return $"{Carpeta}/{nombre}.fbx";
+        foreach (var ruta in Sueltos) yield return ruta;
+    }
 
     // Materiales de corteza en el .blend (los nombres que trae el FBX).
     static readonly string[] Cortezas = { "M_TroncoArrayan", "M_Olivillo" };
@@ -33,11 +43,7 @@ public class ArbolesArrayanOlivillo : AssetPostprocessor
 
     static bool EsCorteza(Material m) => m != null && System.Array.IndexOf(Cortezas, m.name) >= 0;
 
-    bool EsArbol()
-    {
-        if (!assetPath.StartsWith(Carpeta + "/") || !assetPath.EndsWith(".fbx")) return false;
-        return System.Array.IndexOf(Modelos, System.IO.Path.GetFileNameWithoutExtension(assetPath)) >= 0;
-    }
+    bool EsArbol() => System.Linq.Enumerable.Contains(RutasFbx(), assetPath);
 
     // Con Read/Write apagado lo que se escribe en la malla se pierde (queda con 0 vertices).
     void OnPreprocessModel()
@@ -88,6 +94,52 @@ public class ArbolesArrayanOlivillo : AssetPostprocessor
             t.Flush();
             EditorUtility.SetDirty(td);
             Debug.Log($"{t.name}: prototipos de arrayan y olivillo cambiados por sus prefabs.");
+        }
+        AssetDatabase.SaveAssets();
+    }
+
+    // Arbol_<nombre>_Lejos.prefab (dos planos con la foto del arbol, ver ArbolesLejanosSur) de los cuatro prefabs, y
+    // los agrega como prototipos sin pintar ninguno: ArbolesVisibles los usa en lugar del arbol de verdad pasada su
+    // distanciaDetalle. Re-correrlo si cambian los prefabs o sus materiales.
+    const float TonoCortezaLejos = 0.55f;
+
+    [MenuItem("Terrenos/Centro/Arrayan y olivillo lejanos")]
+    static void Lejanos()
+    {
+        var cercanos = new List<(string, GameObject)>();
+        foreach (var nombre in Modelos)
+        {
+            var prefab = AssetDatabase.LoadAssetAtPath<GameObject>($"{Carpeta}/Arbol_{nombre}.prefab");
+            if (prefab != null) cercanos.Add((nombre, prefab));
+        }
+        if (cercanos.Count == 0) { Debug.LogWarning("Faltan los Arbol_*.prefab: correr antes 'Arrayan y olivillo al Terrain'."); return; }
+        // Corteza al 55%: los troncos lejanos salian claros (rosados los del olivillo) al lado de los de verdad.
+        var lejanos = ArbolesLejanosSur.Crear(cercanos, Carpeta, TonoCortezaLejos);
+
+        // Brillo y tinte igualados contra los arboles de verdad en la misma vista (2026-10-20, pantallazos con
+        // distanciaDetalle 60 contra 2500). El corte de alfa mas bajo: a 300 m o mas las copas se afinaban en los
+        // mips y la linea del bosque quedaba mas baja que con los de verdad.
+        var mat = AssetDatabase.LoadAssetAtPath<Material>(CarpetaMat + "/M_Arboles_Lejos.mat");
+        mat.SetFloat("_Brillo", 0.98f);
+        mat.SetColor("_Tinte", new Color(0.87f, 0.89f, 1.08f));
+        mat.SetFloat("_Cutoff", 0.35f);
+        EditorUtility.SetDirty(mat);
+
+        foreach (var t in Terrain.activeTerrains)
+        {
+            var td = t.terrainData;
+            var protos = new List<TreePrototype>(td.treePrototypes);
+            if (!protos.Exists(p => cercanos.Exists(c => c.Item2 == p.prefab))) continue;
+            int antes = protos.Count;
+            foreach (var l in lejanos)
+                if (!protos.Exists(p => p.prefab == l)) protos.Add(new TreePrototype { prefab = l });
+            if (protos.Count == antes) continue;
+            Undo.RegisterCompleteObjectUndo(td, "Arrayan y olivillo lejanos");
+            td.treePrototypes = protos.ToArray();
+            td.RefreshPrototypes();
+            t.Flush();
+            EditorUtility.SetDirty(td);
+            Debug.Log($"{t.name}: {protos.Count - antes} prototipos lejanos agregados ({protos.Count} en total).");
         }
         AssetDatabase.SaveAssets();
     }
@@ -160,9 +212,8 @@ public class ArbolesArrayanOlivillo : AssetPostprocessor
         };
         AssetDatabase.SaveAssets();
 
-        foreach (var nombre in Modelos)
+        foreach (var ruta in RutasFbx())
         {
-            string ruta = $"{Carpeta}/{nombre}.fbx";
             if (!(AssetImporter.GetAtPath(ruta) is ModelImporter mi)) continue;
             foreach (var m in mats)
                 mi.AddRemap(new AssetImporter.SourceAssetIdentifier(typeof(Material), m.Key), m.Value);

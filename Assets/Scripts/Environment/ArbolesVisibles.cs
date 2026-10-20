@@ -14,6 +14,9 @@ using UnityEngine.Rendering;
 //      mismo nombre + "_Lejos" entre los prototipos del Terrain). Todo lo visible de un mismo tipo sale en
 //      una sola llamada a Graphics.RenderMeshInstanced.
 // Los materiales necesitan "Enable GPU Instancing" (los de coigue/cipres ya lo tienen).
+// Prefabs con varios LOD y sin "_Lejos" (los arbustos de Centro): cada uno se dibuja con el LOD que elegiria su
+// LODGroup a esa distancia (no el LOD0 hasta distanciaDetalle: con 10k arbustos eso era peor que no tener este
+// componente), y se dejan de dibujar donde los cortaria (por eso no llegan hasta distanciaMaxima).
 // Si se repintan arboles, no hay que hacer nada: la grilla se arma al entrar en Play.
 [RequireComponent(typeof(Terrain))]
 [DisallowMultipleComponent]
@@ -31,6 +34,9 @@ public class ArbolesVisibles : MonoBehaviour
     public int pruebasPorFrame = 120;
     [Tooltip("Lado de cada celda de la grilla, en metros. Se usa al entrar en Play.")]
     public float tamanoCelda = 64f;
+    [Tooltip("Multiplica el lodBias para elegir el LOD y el corte de los prefabs con varios LOD (arbustos). " +
+             "Menos de 1 = pasan antes a un LOD mas simple y se apagan mas cerca.")]
+    [Range(0.1f, 1f)] public float sesgoLod = 1f;
 
     [Header("Estado (solo lectura)")]
     [SerializeField] int arbolesDeVerdad;
@@ -84,6 +90,13 @@ public class ArbolesVisibles : MonoBehaviour
         public int lejos = -1;          // Tipo que lo reemplaza a distancia
         public bool esLejano;           // es un _Lejos: siempre se dibuja como lejano
         public Bounds limitesRaiz;      // de todas las piezas, en el espacio de la raiz
+        public float corte;             // alto relativo en pantalla del ultimo LOD (0 = sin corte propio)
+        public float tamano;            // LODGroup.size
+        public float escalaMax = 1f;    // la mayor escala de sus arboles en el Terrain
+        public float corte2;            // distancia de corte al cuadrado, de este frame
+        public int[] niveles;           // varios LOD sin _Lejos: el Tipo de cada LOD (niveles[0] = este)
+        public float[] alturas;         // alto relativo en pantalla donde termina cada LOD
+        public float[] niveles2;        // distancia al cuadrado donde termina cada LOD, de este frame
     }
 
     // Los arboles de un Tipo dentro de una celda
@@ -143,28 +156,55 @@ public class ArbolesVisibles : MonoBehaviour
     void ArmarTipos()
     {
         TreePrototype[] protos = terreno.terrainData.treePrototypes;
-        tipos = new Tipo[protos.Length];
+        var lista = new List<Tipo>();
         for (int i = 0; i < protos.Length; i++)
-            tipos[i] = ArmarTipo(protos[i].prefab);
+            lista.Add(ArmarTipo(protos[i].prefab, null));
 
-        for (int i = 0; i < tipos.Length; i++)
+        for (int i = 0; i < protos.Length; i++)
         {
-            if (tipos[i] == null) continue;
-            tipos[i].esLejano = tipos[i].nombre.EndsWith("_Lejos");
-            for (int j = 0; j < tipos.Length; j++)
-                if (tipos[j] != null && tipos[j].nombre == tipos[i].nombre + "_Lejos") tipos[i].lejos = j;
+            if (lista[i] == null) continue;
+            lista[i].esLejano = lista[i].nombre.EndsWith("_Lejos");
+            for (int j = 0; j < protos.Length; j++)
+                if (lista[j] != null && lista[j].nombre == lista[i].nombre + "_Lejos") lista[i].lejos = j;
+
+            // Varios LOD y sin _Lejos: un Tipo por LOD, elegido por distancia como lo haria el LODGroup, que
+            // tambien pone el corte. El ultimo LOD hace de version lejana (para los limites de las celdas).
+            var lodGroup = protos[i].prefab.GetComponent<LODGroup>();
+            if (lodGroup == null || lodGroup.lodCount < 2) continue;
+            LOD[] lods = lodGroup.GetLODs();
+            lista[i].corte = lods[lods.Length - 1].screenRelativeTransitionHeight;
+            lista[i].tamano = lodGroup.size;
+            if (lista[i].lejos >= 0 || lista[i].esLejano) continue;
+            var niveles = new int[lods.Length];
+            var alturas = new float[lods.Length];
+            niveles[0] = i;
+            for (int k = 0; k < lods.Length; k++)
+            {
+                alturas[k] = lods[k].screenRelativeTransitionHeight;
+                if (k == 0) continue;
+                var nivel = ArmarTipo(protos[i].prefab, lods[k].renderers);
+                nivel.nombre += $" (LOD{k})";
+                niveles[k] = lista.Count;
+                lista.Add(nivel);
+            }
+            lista[i].niveles = niveles;
+            lista[i].alturas = alturas;
+            lista[i].niveles2 = new float[lods.Length];
+            lista[i].lejos = niveles[lods.Length - 1];
         }
+        tipos = lista.ToArray();
     }
 
-    Tipo ArmarTipo(GameObject prefab)
+    Tipo ArmarTipo(GameObject prefab, Renderer[] renderers)
     {
         if (prefab == null) return null;
         Transform raiz = prefab.transform;
 
-        Renderer[] renderers;
         var lodGroup = prefab.GetComponent<LODGroup>();
-        if (lodGroup != null && lodGroup.lodCount > 0) renderers = lodGroup.GetLODs()[0].renderers;
-        else renderers = prefab.GetComponentsInChildren<MeshRenderer>(true);
+        if (renderers == null)
+            renderers = lodGroup != null && lodGroup.lodCount > 0
+                ? lodGroup.GetLODs()[0].renderers
+                : prefab.GetComponentsInChildren<MeshRenderer>(true);
 
         var piezas = new List<Pieza>();
         var conSombra = new List<Lote>();
@@ -230,6 +270,7 @@ public class ArbolesVisibles : MonoBehaviour
         {
             Tipo tipo = arbol.prototypeIndex < tipos.Length ? tipos[arbol.prototypeIndex] : null;
             if (tipo == null || tipo.piezas.Length == 0) continue;
+            tipo.escalaMax = Mathf.Max(tipo.escalaMax, arbol.widthScale, arbol.heightScale);
 
             Vector3 pos = Vector3.Scale(arbol.position, tamano) + origen;
             var rot = Quaternion.AngleAxis(arbol.rotation * Mathf.Rad2Deg, Vector3.up);
@@ -301,6 +342,22 @@ public class ArbolesVisibles : MonoBehaviour
         float sombra2 = distanciaSombras * distanciaSombras;
         float maxima2 = distanciaMaxima * distanciaMaxima;
 
+        // Donde el LODGroup cortaria a cada tipo: alto en pantalla = tamano / (2 d tan(fov/2)), por el lodBias.
+        float tanMedio = Mathf.Tan(cam.fieldOfView * 0.5f * Mathf.Deg2Rad);
+        float bias = QualitySettings.lodBias * sesgoLod;
+        foreach (Tipo t in tipos)
+        {
+            if (t == null || t.corte <= 0f) continue;
+            float d = t.tamano * t.escalaMax * bias / (2f * tanMedio * t.corte);
+            t.corte2 = d * d;
+            if (t.niveles == null) continue;
+            for (int k = 0; k < t.alturas.Length; k++)
+            {
+                float dk = t.tamano * t.escalaMax * bias / (2f * tanMedio * t.alturas[k]);
+                t.niveles2[k] = dk * dk;
+            }
+        }
+
         foreach (Celda celda in celdas)
         {
             float dMin2 = celda.limites.SqrDistance(ojo);
@@ -316,6 +373,12 @@ public class ArbolesVisibles : MonoBehaviour
             foreach (Grupo g in celda.grupos)
             {
                 Tipo tipo = tipos[g.tipo];
+                if (tipo.corte2 > 0f && dMin2 > tipo.corte2) continue;
+                if (tipo.niveles != null)
+                {
+                    AgregarPorLod(tipo, g, celda.limites, ojo, sombra2);
+                    continue;
+                }
                 if (tipo.esLejano || (todaLejos && tipo.lejos >= 0))
                 {
                     Tipo lejano = tipo.esLejano ? tipo : tipos[tipo.lejos];
@@ -334,6 +397,7 @@ public class ArbolesVisibles : MonoBehaviour
                 for (int i = 0; i < g.raices.Length; i++)
                 {
                     float d2 = (g.posiciones[i] - ojo).sqrMagnitude;
+                    if (tipo.corte2 > 0f && d2 > tipo.corte2) continue;
                     if (todaCerca || d2 < detalle2 || tipo.lejos < 0)
                     {
                         Agregar(d2 < sombra2 ? tipo.lotesConSombra : tipo.lotesSinSombra, tipo.piezas, g.raices[i], celda.limites);
@@ -350,6 +414,22 @@ public class ArbolesVisibles : MonoBehaviour
         }
 
         Dibujar();
+    }
+
+    // Cada arbol con el LOD que le toca por distancia (el ultimo de niveles2 es el corte).
+    void AgregarPorLod(Tipo tipo, Grupo g, Bounds limites, Vector3 ojo, float sombra2)
+    {
+        int ultimo = tipo.niveles.Length - 1;
+        for (int i = 0; i < g.raices.Length; i++)
+        {
+            float d2 = (g.posiciones[i] - ojo).sqrMagnitude;
+            if (d2 > tipo.niveles2[ultimo]) continue;
+            int k = 0;
+            while (k < ultimo && d2 > tipo.niveles2[k]) k++;
+            Tipo nivel = tipos[tipo.niveles[k]];
+            Agregar(d2 < sombra2 ? nivel.lotesConSombra : nivel.lotesSinSombra, nivel.piezas, g.raices[i], limites);
+            if (k == 0) arbolesDeVerdad++; else arbolesLejanos++;
+        }
     }
 
     void Agregar(Lote[] lotes, Pieza[] piezas, Matrix4x4 raiz, Bounds limites)

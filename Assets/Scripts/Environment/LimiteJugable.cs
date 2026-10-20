@@ -4,8 +4,10 @@ using UnityEngine;
 // Paredes invisibles que no dejan al jugador salir de la zona jugable.
 //
 // En Sur son dos recintos: la isla de Puerto Eden y la isla del Parque O'Higgins (a la que se llega en canoa).
-// Las paredes son BoxColliders hijos de este objeto y las arma el menu Terrenos > Sur > Generar limite jugable
-// (Editor/LimiteJugableSur.cs) a partir de las guias: el contorno trazado a mano sobre el mapa. La pared va por
+// En Centro es uno solo, con pocas paredes rectas que van justo por la guia (paredesPorGuia), y en Norte es el rectangulo del pueblo de Isluga (ahi no hay mar: la pared va justo por
+// la guia). Las paredes son BoxColliders hijos de este objeto y las arma el menu
+// Terrenos > (escena) > Generar limite jugable (Editor/LimiteJugableGenerador.cs) a partir de las guias: el
+// contorno trazado a mano sobre el mapa. La pared va por
 // la costa real del Terrain (un poco dentro del agua, ver nivelCosta); solo donde la guia cruza tierra (istmos)
 // manda la guia. La pasarela queda siempre adentro.
 //
@@ -37,6 +39,8 @@ public class LimiteJugable : MonoBehaviour
     public Guia[] guias;
 
     [Header("Generacion")]
+    [Tooltip("La pared va justo por la guia, una pared por lado, sin mirar la costa. Para contornos casi rectos.")]
+    public bool paredesPorGuia;
     [Tooltip("La pared va por donde el fondo queda a esta altura (m, el mar esta en 0). Negativo = un poco dentro del agua.")]
     public float nivelCosta = -0.5f;
     [Tooltip("Cuanto puede quedar la costa por fuera de la guia (m). Mas lejos que esto, la pared sigue a la guia.")]
