@@ -6,11 +6,15 @@ using UnityEngine.Rendering.RenderGraphModule;
 using UnityEngine.Rendering.Universal;
 
 /// <summary>
-/// Pase de estilo general tipo Ghibli para URP: cuantización suave de la luz,
-/// pigmento anclado al mundo y perspectiva aérea por profundidad.
+/// Pase de pantalla para URP que ajusta brillo y color del paisaje: escalonado y
+/// variacion de brillo, correccion de color por matiz y perspectiva aerea por
+/// profundidad.
 /// Corre antes del post-proceso, así que el tonemapping y el color grading
 /// siguen aplicándose encima.
-/// Se agrega al Renderer de URP (PC_Renderer) como Renderer Feature.
+/// Se agrega al Renderer de URP (PC_Renderer) como Renderer Feature. Los valores
+/// no viven aca sino en el perfil del Global Volume de cada zona, con los overrides
+/// <see cref="AjusteDeBrillo"/>, <see cref="CorreccionDeColorPorMatiz"/> y
+/// <see cref="PerspectivaAerea"/>.
 /// </summary>
 public class RenderShaderURP : ScriptableRendererFeature
 {
@@ -20,71 +24,11 @@ public class RenderShaderURP : ScriptableRendererFeature
         public Shader shader;
         [Tooltip("Hidden/Terrenos/MascaraPersonajes. Sin el, los personajes reciben el pase completo.")]
         public Shader shaderMascara;
-        [Tooltip("Capa de render de los personajes y animales. A ellos no se les aplica la " +
-                 "cuantizacion de luz ni las bandas de color (calibradas para el paisaje); " +
-                 "si el pigmento y la perspectiva aerea. Nada = sin mascara.")]
+        [Tooltip("Capa de render de los personajes y animales. A ellos no se les aplica el " +
+                 "escalonado de luz ni la correccion por matiz (calibrados para el paisaje); " +
+                 "si la variacion de brillo y la perspectiva aerea. Nada = sin mascara.")]
         public RenderingLayerMask capaPersonajes = 0;
         public RenderPassEvent evento = RenderPassEvent.BeforeRenderingPostProcessing;
-
-        [Header("Cuantizacion de luz")]
-        [Tooltip("En cuántos valores se pinta la luz. Pocos = más ilustrado.")]
-        [Range(2f, 16f)] public float pasosDeLuz = 6f;
-        [Tooltip("Qué tan blando es el borde entre valores. 0 = escalón duro (toon).")]
-        [Range(0.01f, 0.5f)] public float suavidadBorde = 0.22f;
-        [Tooltip("0 apaga la cuantización.")]
-        [Range(0f, 1f)] public float fuerzaPintura = 0.45f;
-
-        [Header("Pigmento")]
-        [Tooltip("Tamaño de las manchas, en metros de mundo.")]
-        [Range(0.005f, 0.5f)] public float escalaPigmento = 0.06f;
-        [Tooltip("0 apaga el pigmento.")]
-        [Range(0f, 0.3f)] public float fuerzaPigmento = 0.07f;
-
-        [Header("Vegetacion  saturacion por matiz)")]
-        [Tooltip("Multiplica la saturacion del verde. 1 = sin cambio. URP ignora el tinte " +
-                 "de las capas de terreno, asi que el pasto solo se corrige desde aca.")]
-        [Range(0.2f, 3f)] public float saturacionVegetacion = 1.6f;
-        [Tooltip("Multiplica el brillo de la vegetacion. 1 = sin cambio.")]
-        [Range(0.5f, 2f)] public float brilloVegetacion = 1f;
-        [Tooltip("Matiz al que se corre el verde, en grados. 60 = verde amarillento, " +
-                 "130 = verde azulado de selva fria.")]
-        [Range(25f, 170f)] public float matizVegetacion = 60f;
-        [Tooltip("Cuanto se corre hacia ese matiz. 0 = solo satura, no corrige el tono.")]
-        [Range(0f, 1f)] public float correccionMatiz = 0.45f;
-        [Tooltip("Ventana de matiz afectada (grados): sube de x a y, baja de z a w.")]
-        public Vector4 rangoMatiz = new Vector4(48f, 70f, 150f, 185f);
-
-        [Header("Arena  saturacion por matiz")]
-        [Tooltip("Multiplica la saturacion de la arena. 1 = sin cambio.")]
-        [Range(0.2f, 3f)] public float saturacionArena = 1.8f;
-        [Tooltip("Multiplica el brillo de la arena/suelo. 1 = sin cambio.")]
-        [Range(0.5f, 2f)] public float brilloArena = 1f;
-        [Tooltip("Matiz al que se corre la arena, en grados. 38 = arena dorada.")]
-        [Range(15f, 60f)] public float matizArena = 38f;
-        [Range(0f, 1f)] public float correccionMatizArena = 0.5f;
-        [Tooltip("Ventana de matiz de la arena. Termina antes de donde empieza la del pasto.")]
-        public Vector4 rangoMatizArena = new Vector4(12f, 26f, 44f, 52f);
-
-        [Header("Cielo y agua  saturacion por matiz")]
-        [Tooltip("Multiplica la saturacion de los azules. El cielo del altiplano y el " +
-                 "fiordo de Sur son mucho mas intensos de lo que rinde el cielo dinamico.")]
-        [Range(0.2f, 3f)] public float saturacionCielo = 1f;
-        [Tooltip("Multiplica el brillo de los azules. 1 = sin cambio.")]
-        [Range(0.5f, 2f)] public float brilloCielo = 1f;
-        [Tooltip("Matiz al que se corren los azules, en grados. 205 = azul de mar.")]
-        [Range(160f, 260f)] public float matizCielo = 205f;
-        [Range(0f, 1f)] public float correccionMatizCielo = 0.4f;
-        [Tooltip("Ventana de matiz de los azules. Empieza despues de donde termina la del pasto.")]
-        public Vector4 rangoMatizCielo = new Vector4(165f, 190f, 235f, 260f);
-
-        [Header("Perspectiva aerea")]
-        public Color colorDelAire = new Color(0.72f, 0.80f, 0.86f);
-        [Tooltip("Distancia a la que empieza a palidecer.")]
-        public float distanciaInicio = 60f;
-        [Tooltip("Distancia a la que el efecto llega a pleno.")]
-        public float distanciaPlena = 600f;
-        [Range(0f, 1f)] public float tinteAire = 0.55f;
-        [Range(0f, 1f)] public float desaturacionAire = 0.45f;
     }
 
     public Ajustes ajustes = new Ajustes();
@@ -124,14 +68,14 @@ public class RenderShaderURP : ScriptableRendererFeature
     {
         private static readonly int AireColor = Shader.PropertyToID("_AireColor");
         private static readonly int AireParams = Shader.PropertyToID("_AireParams");
-        private static readonly int PinturaParams = Shader.PropertyToID("_PinturaParams");
-        private static readonly int PigmentoParams = Shader.PropertyToID("_PigmentoParams");
-        private static readonly int VegeParams = Shader.PropertyToID("_VegeParams");
-        private static readonly int VegeRango = Shader.PropertyToID("_VegeRango");
-        private static readonly int ArenaParams = Shader.PropertyToID("_ArenaParams");
-        private static readonly int ArenaRango = Shader.PropertyToID("_ArenaRango");
-        private static readonly int CieloParams = Shader.PropertyToID("_CieloParams");
-        private static readonly int CieloRango = Shader.PropertyToID("_CieloRango");
+        private static readonly int Escalonado = Shader.PropertyToID("_Escalonado");
+        private static readonly int Variacion = Shader.PropertyToID("_Variacion");
+        private static readonly int BandaVegetacion = Shader.PropertyToID("_BandaVegetacion");
+        private static readonly int VentanaVegetacion = Shader.PropertyToID("_VentanaVegetacion");
+        private static readonly int BandaSuelo = Shader.PropertyToID("_BandaSuelo");
+        private static readonly int VentanaSuelo = Shader.PropertyToID("_VentanaSuelo");
+        private static readonly int BandaCielo = Shader.PropertyToID("_BandaCielo");
+        private static readonly int VentanaCielo = Shader.PropertyToID("_VentanaCielo");
         private static readonly int AireColorGlobal = Shader.PropertyToID("_AireColorGlobal");
         private static readonly int AireParamsGlobal = Shader.PropertyToID("_AireParamsGlobal");
         private static readonly int MascaraPersonajes = Shader.PropertyToID("_MascaraPersonajes");
@@ -175,66 +119,41 @@ public class RenderShaderURP : ScriptableRendererFeature
 
             if (resources.isActiveTargetBackBuffer) return;
 
-            // Cada escena puede pisar estos valores desde el perfil de su Global Volume.
-            // Sin override, manda lo que tenga el Feature. Esto existe porque el Feature
-            // es global: los valores de la playa de Centro ponian naranja el altiplano
-            // de Norte.
-            var vol = VolumeManager.instance.stack != null
-                    ? VolumeManager.instance.stack.GetComponent<EstiloGhibliVolumen>()
-                    : null;
+            // Los valores salen del perfil del Global Volume de la zona. Sin override,
+            // cada componente queda en su valor por defecto, que no hace nada.
+            var stack = VolumeManager.instance.stack;
+            if (stack == null) return;
+            var brillo = stack.GetComponent<AjusteDeBrillo>();
+            var matiz = stack.GetComponent<CorreccionDeColorPorMatiz>();
+            var aire = stack.GetComponent<PerspectivaAerea>();
 
-            float pasosDeLuz      = vol != null ? EstiloGhibliVolumen.Elegir(vol.pasosDeLuz, ajustes.pasosDeLuz) : ajustes.pasosDeLuz;
-            float suavidadBorde   = vol != null ? EstiloGhibliVolumen.Elegir(vol.suavidadBorde, ajustes.suavidadBorde) : ajustes.suavidadBorde;
-            float fuerzaPintura   = vol != null ? EstiloGhibliVolumen.Elegir(vol.fuerzaPintura, ajustes.fuerzaPintura) : ajustes.fuerzaPintura;
-            float escalaPigmento  = vol != null ? EstiloGhibliVolumen.Elegir(vol.escalaPigmento, ajustes.escalaPigmento) : ajustes.escalaPigmento;
-            float fuerzaPigmento  = vol != null ? EstiloGhibliVolumen.Elegir(vol.fuerzaPigmento, ajustes.fuerzaPigmento) : ajustes.fuerzaPigmento;
-            float satVege         = vol != null ? EstiloGhibliVolumen.Elegir(vol.saturacionVegetacion, ajustes.saturacionVegetacion) : ajustes.saturacionVegetacion;
-            float brilloVege      = vol != null ? EstiloGhibliVolumen.Elegir(vol.brilloVegetacion, ajustes.brilloVegetacion) : ajustes.brilloVegetacion;
-            float matizVege       = vol != null ? EstiloGhibliVolumen.Elegir(vol.matizVegetacion, ajustes.matizVegetacion) : ajustes.matizVegetacion;
-            float corrVege        = vol != null ? EstiloGhibliVolumen.Elegir(vol.correccionMatiz, ajustes.correccionMatiz) : ajustes.correccionMatiz;
-            Vector4 rangoVege     = vol != null ? EstiloGhibliVolumen.Elegir(vol.rangoMatiz, ajustes.rangoMatiz) : ajustes.rangoMatiz;
-            float satArena        = vol != null ? EstiloGhibliVolumen.Elegir(vol.saturacionArena, ajustes.saturacionArena) : ajustes.saturacionArena;
-            float brilloArena     = vol != null ? EstiloGhibliVolumen.Elegir(vol.brilloArena, ajustes.brilloArena) : ajustes.brilloArena;
-            float matizArena      = vol != null ? EstiloGhibliVolumen.Elegir(vol.matizArena, ajustes.matizArena) : ajustes.matizArena;
-            float corrArena       = vol != null ? EstiloGhibliVolumen.Elegir(vol.correccionMatizArena, ajustes.correccionMatizArena) : ajustes.correccionMatizArena;
-            Vector4 rangoArena    = vol != null ? EstiloGhibliVolumen.Elegir(vol.rangoMatizArena, ajustes.rangoMatizArena) : ajustes.rangoMatizArena;
-            float satCielo        = vol != null ? EstiloGhibliVolumen.Elegir(vol.saturacionCielo, ajustes.saturacionCielo) : ajustes.saturacionCielo;
-            float brilloCielo     = vol != null ? EstiloGhibliVolumen.Elegir(vol.brilloCielo, ajustes.brilloCielo) : ajustes.brilloCielo;
-            float matizCielo      = vol != null ? EstiloGhibliVolumen.Elegir(vol.matizCielo, ajustes.matizCielo) : ajustes.matizCielo;
-            float corrCielo       = vol != null ? EstiloGhibliVolumen.Elegir(vol.correccionMatizCielo, ajustes.correccionMatizCielo) : ajustes.correccionMatizCielo;
-            Vector4 rangoCielo    = vol != null ? EstiloGhibliVolumen.Elegir(vol.rangoMatizCielo, ajustes.rangoMatizCielo) : ajustes.rangoMatizCielo;
-            Color colorAire       = vol != null ? EstiloGhibliVolumen.Elegir(vol.colorDelAire, ajustes.colorDelAire) : ajustes.colorDelAire;
-            float distInicio      = vol != null ? EstiloGhibliVolumen.Elegir(vol.distanciaInicio, ajustes.distanciaInicio) : ajustes.distanciaInicio;
-            float distPlena       = vol != null ? EstiloGhibliVolumen.Elegir(vol.distanciaPlena, ajustes.distanciaPlena) : ajustes.distanciaPlena;
-            float tinteAire       = vol != null ? EstiloGhibliVolumen.Elegir(vol.tinteAire, ajustes.tinteAire) : ajustes.tinteAire;
-            float desatAire       = vol != null ? EstiloGhibliVolumen.Elegir(vol.desaturacionAire, ajustes.desaturacionAire) : ajustes.desaturacionAire;
-
-            // Si todo quedo en cero el pase no aporta nada y solo costaria dos blits
+            // Si nada esta activo el pase no aporta nada y solo costaria dos blits
             // de pantalla completa.
-            bool algoQueHacer = fuerzaPintura > 0f || fuerzaPigmento > 0f
-                             || tinteAire > 0f || desatAire > 0f
-                             || satVege != 1f || corrVege > 0f || brilloVege != 1f
-                             || satArena != 1f || corrArena > 0f || brilloArena != 1f
-                             || satCielo != 1f || brilloCielo != 1f;
-            if (!algoQueHacer) return;
+            if (!brillo.IsActive() && !matiz.IsActive() && !aire.IsActive()) return;
 
-            material.SetColor(AireColor, colorAire);
-            material.SetVector(AireParams, new Vector4(distInicio, distPlena, tinteAire, desatAire));
-            material.SetVector(PinturaParams, new Vector4(pasosDeLuz, suavidadBorde, fuerzaPintura, 0f));
-            material.SetVector(PigmentoParams, new Vector4(escalaPigmento, fuerzaPigmento, 0f, 0f));
-            material.SetVector(VegeParams, new Vector4(satVege, matizVege, corrVege, brilloVege));
-            material.SetVector(VegeRango, rangoVege);
-            material.SetVector(ArenaParams, new Vector4(satArena, matizArena, corrArena, brilloArena));
-            material.SetVector(ArenaRango, rangoArena);
-            material.SetVector(CieloParams, new Vector4(satCielo, matizCielo, corrCielo, brilloCielo));
-            material.SetVector(CieloRango, rangoCielo);
+            Vector2 distancia = aire.distancia.value;
+            var paramsAire = new Vector4(distancia.x, distancia.y, aire.tinte.value, aire.desaturacion.value);
+            material.SetColor(AireColor, aire.color.value);
+            material.SetVector(AireParams, paramsAire);
+            material.SetVector(Escalonado, new Vector4(brillo.nivelesDeLuz.value, brillo.suavidadEntreNiveles.value,
+                                                       brillo.intensidadEscalonado.value, 0f));
+            material.SetVector(Variacion, new Vector4(brillo.frecuenciaVariacion.value, brillo.intensidadVariacion.value, 0f, 0f));
+            material.SetVector(BandaVegetacion, new Vector4(matiz.saturacionVegetacion.value, matiz.matizVegetacion.value,
+                                                            matiz.correccionMatizVegetacion.value, matiz.brilloVegetacion.value));
+            material.SetVector(VentanaVegetacion, CorreccionDeColorPorMatiz.Ventana(matiz.rangoVegetacion, matiz.suavizadoVegetacion));
+            material.SetVector(BandaSuelo, new Vector4(matiz.saturacionSuelo.value, matiz.matizSuelo.value,
+                                                       matiz.correccionMatizSuelo.value, matiz.brilloSuelo.value));
+            material.SetVector(VentanaSuelo, CorreccionDeColorPorMatiz.Ventana(matiz.rangoSuelo, matiz.suavizadoSuelo));
+            material.SetVector(BandaCielo, new Vector4(matiz.saturacionCielo.value, matiz.matizCielo.value,
+                                                       matiz.correccionMatizCielo.value, matiz.brilloCielo.value));
+            material.SetVector(VentanaCielo, CorreccionDeColorPorMatiz.Ventana(matiz.rangoCielo, matiz.suavizadoCielo));
 
             // El agua es transparente y no escribe en la textura de profundidad, asi
             // que este pase la toma por cielo y la saltea. Se publican los parametros
             // como globales para que el shader del agua aplique la misma perspectiva
             // aerea por su cuenta y las dos superficies se desvanezcan igual.
-            Shader.SetGlobalColor(AireColorGlobal, colorAire);
-            Shader.SetGlobalVector(AireParamsGlobal, new Vector4(distInicio, distPlena, tinteAire, desatAire));
+            Shader.SetGlobalColor(AireColorGlobal, aire.color.value);
+            Shader.SetGlobalVector(AireParamsGlobal, paramsAire);
 
             var desc = cameraData.cameraTargetDescriptor;
             desc.depthBufferBits = 0;

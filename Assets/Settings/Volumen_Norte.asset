@@ -26,11 +26,11 @@ MonoBehaviour:
     m_OverrideState: 1
     m_Value: 0.464
   clamp:
-    m_OverrideState: 0
+    m_OverrideState: 1
     m_Value: 65472
   tint:
-    m_OverrideState: 1
-    m_Value: {r: 1, g: 1, b: 1, a: 1}
+    m_OverrideState: 0
+    m_Value: {r: 0.015426505, g: 0.45988733, b: 0.9811321, a: 1}
   highQualityFiltering:
     m_OverrideState: 1
     m_Value: 1
@@ -47,6 +47,73 @@ MonoBehaviour:
   dirtIntensity:
     m_OverrideState: 0
     m_Value: 0
+--- !u!114 &-5128195567979668417
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bb12851f1e920f24c8f6d2dcdf2e659d, type: 3}
+  m_Name: CorreccionDeColorPorMatiz
+  m_EditorClassIdentifier: 
+  active: 1
+  saturacionVegetacion:
+    m_OverrideState: 1
+    m_Value: 0.7
+  brilloVegetacion:
+    m_OverrideState: 1
+    m_Value: 1.15
+  matizVegetacion:
+    m_OverrideState: 1
+    m_Value: 52
+  correccionMatizVegetacion:
+    m_OverrideState: 1
+    m_Value: 0.45
+  rangoVegetacion:
+    m_OverrideState: 1
+    m_Value: {x: 58, y: 110}
+  suavizadoVegetacion:
+    m_OverrideState: 1
+    m_Value: {x: 13, y: 30}
+  saturacionSuelo:
+    m_OverrideState: 1
+    m_Value: 1.38
+  brilloSuelo:
+    m_OverrideState: 1
+    m_Value: 1.287
+  matizSuelo:
+    m_OverrideState: 1
+    m_Value: 20.4
+  correccionMatizSuelo:
+    m_OverrideState: 1
+    m_Value: 0.75
+  rangoSuelo:
+    m_OverrideState: 1
+    m_Value: {x: 2, y: 40}
+  suavizadoSuelo:
+    m_OverrideState: 1
+    m_Value: {x: 18, y: 12}
+  saturacionCielo:
+    m_OverrideState: 1
+    m_Value: 1.15
+  brilloCielo:
+    m_OverrideState: 1
+    m_Value: 1
+  matizCielo:
+    m_OverrideState: 1
+    m_Value: 236
+  correccionMatizCielo:
+    m_OverrideState: 1
+    m_Value: 0.78
+  rangoCielo:
+    m_OverrideState: 1
+    m_Value: {x: 204, y: 240}
+  suavizadoCielo:
+    m_OverrideState: 1
+    m_Value: {x: 14, y: 14}
 --- !u!114 &-3357603926938260329
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -68,101 +135,38 @@ MonoBehaviour:
     m_Value: {x: 0.5, y: 0.5}
   intensity:
     m_OverrideState: 1
-    m_Value: 0.181
+    m_Value: 0.238
   smoothness:
     m_OverrideState: 1
     m_Value: 0.738
   rounded:
     m_OverrideState: 0
     m_Value: 0
---- !u!114 &-1394611901448362057
+--- !u!114 &-2408106685197517821
 MonoBehaviour:
-  m_ObjectHideFlags: 1
+  m_ObjectHideFlags: 3
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e75ca214849c0d643afa5a0923e8c659, type: 3}
-  m_Name: EstiloGhibliVolumen
+  m_Script: {fileID: 11500000, guid: dafd5bd43051a76459a03d364c8e8996, type: 3}
+  m_Name: PerspectivaAerea
   m_EditorClassIdentifier: 
   active: 1
-  pasosDeLuz:
-    m_OverrideState: 1
-    m_Value: 2
-  suavidadBorde:
-    m_OverrideState: 1
-    m_Value: 0.089
-  fuerzaPintura:
-    m_OverrideState: 1
-    m_Value: 0.178
-  escalaPigmento:
-    m_OverrideState: 1
-    m_Value: 0.05
-  fuerzaPigmento:
-    m_OverrideState: 1
-    m_Value: 0.05
-  saturacionVegetacion:
-    m_OverrideState: 1
-    m_Value: 0.7
-  brilloVegetacion:
-    m_OverrideState: 1
-    m_Value: 1.15
-  matizVegetacion:
-    m_OverrideState: 1
-    m_Value: 52
-  correccionMatiz:
-    m_OverrideState: 1
-    m_Value: 0.45
-  rangoMatiz:
-    m_OverrideState: 1
-    m_Value: {x: 45, y: 58, z: 110, w: 140}
-  saturacionArena:
-    m_OverrideState: 1
-    m_Value: 0.95
-  brilloArena:
-    m_OverrideState: 1
-    m_Value: 1.7
-  matizArena:
-    m_OverrideState: 1
-    m_Value: 33
-  correccionMatizArena:
-    m_OverrideState: 1
-    m_Value: 0.75
-  rangoMatizArena:
-    m_OverrideState: 1
-    m_Value: {x: -16, y: 2, z: 40, w: 52}
-  saturacionCielo:
-    m_OverrideState: 1
-    m_Value: 1.5
-  brilloCielo:
-    m_OverrideState: 1
-    m_Value: 1
-  matizCielo:
-    m_OverrideState: 1
-    m_Value: 238
-  correccionMatizCielo:
-    m_OverrideState: 1
-    m_Value: 0.78
-  rangoMatizCielo:
-    m_OverrideState: 1
-    m_Value: {x: 172, y: 192, z: 206, w: 220}
-  colorDelAire:
-    m_OverrideState: 1
-    m_Value: {r: 0.52, g: 0.64, b: 0.82, a: 1}
-  distanciaInicio:
-    m_OverrideState: 1
-    m_Value: 40
-  distanciaPlena:
-    m_OverrideState: 1
-    m_Value: 500
-  tinteAire:
+  tinte:
     m_OverrideState: 1
     m_Value: 0.439
-  desaturacionAire:
+  desaturacion:
     m_OverrideState: 1
     m_Value: 0.58
+  color:
+    m_OverrideState: 1
+    m_Value: {r: 0.52, g: 0.64, b: 0.82, a: 1}
+  distancia:
+    m_OverrideState: 1
+    m_Value: {x: 40, y: 500}
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -173,16 +177,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d7fd9488000d3734a9e00ee676215985, type: 3}
-  m_Name: SampleSceneProfile
+  m_Name: Volumen_Norte
   m_EditorClassIdentifier: 
   components:
   - {fileID: 849379129802519247}
   - {fileID: -7893295128165547882}
   - {fileID: 7391319092446245454}
   - {fileID: -3357603926938260329}
-  - {fileID: -1394611901448362057}
   - {fileID: 2856771857485757411}
   - {fileID: 7088858932792178755}
+  - {fileID: 1320741274902873746}
+  - {fileID: -5128195567979668417}
+  - {fileID: -2408106685197517821}
 --- !u!114 &849379129802519247
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -223,6 +229,34 @@ MonoBehaviour:
   maxNits:
     m_OverrideState: 1
     m_Value: 647
+--- !u!114 &1320741274902873746
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 80b4a23367b5a9a44bbd827b70cefb6d, type: 3}
+  m_Name: AjusteDeBrillo
+  m_EditorClassIdentifier: 
+  active: 1
+  intensidadEscalonado:
+    m_OverrideState: 1
+    m_Value: 0.178
+  nivelesDeLuz:
+    m_OverrideState: 1
+    m_Value: 3.02
+  suavidadEntreNiveles:
+    m_OverrideState: 1
+    m_Value: 0.089
+  intensidadVariacion:
+    m_OverrideState: 1
+    m_Value: 0.05
+  frecuenciaVariacion:
+    m_OverrideState: 1
+    m_Value: 0.05
 --- !u!114 &2856771857485757411
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -244,7 +278,7 @@ MonoBehaviour:
     m_Value: 8
   colorFilter:
     m_OverrideState: 1
-    m_Value: {r: 1, g: 0.99, b: 0.97, a: 1}
+    m_Value: {r: 1, g: 0.97, b: 0.91, a: 1}
   hueShift:
     m_OverrideState: 1
     m_Value: 0
@@ -266,10 +300,10 @@ MonoBehaviour:
   active: 1
   shadows:
     m_OverrideState: 1
-    m_Value: {r: 0.4, g: 0.5, b: 0.7, a: 1}
+    m_Value: {r: 0.52, g: 0.56, b: 0.66, a: 1}
   highlights:
     m_OverrideState: 1
-    m_Value: {r: 1, g: 0.975, b: 0.94, a: 1}
+    m_Value: {r: 1, g: 0.95, b: 0.85, a: 1}
   balance:
     m_OverrideState: 1
     m_Value: 0
