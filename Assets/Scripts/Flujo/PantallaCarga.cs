@@ -44,8 +44,7 @@ public class PantallaCarga : MonoBehaviour
 
     private void Awake()
     {
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
+        UIManager.Abrir(CapaUI.Carga, this);
 
         if (tituloText != null && !string.IsNullOrEmpty(CargadorEscenas.Titulo)) tituloText.text = CargadorEscenas.Titulo;
         if (datoText != null && !string.IsNullOrEmpty(CargadorEscenas.Dato)) datoText.text = CargadorEscenas.Dato;

@@ -63,16 +63,25 @@ Borrador para revisar. Cuando esté aprobado, estos textos se cargan tal cual en
 > Objetivo: Ayuda a la comunidad en el chaku.
 > Si abandona el minijuego: **Wara:** No pasa nada, las vicuñas son desconfiadas. ¿Lo intentamos otra vez?
 
-### Paso 5 · "Sígueme"
+### Paso 5 · La postal y el viaje
+
+*(Se muestra la postal en pantalla durante esta conversación.)*
 
 **Wara:** ¡Lo hiciste muy bien! Las vicuñas ni se asustaron.
 **Wara:** Oye, Maite... me dijiste que venías siguiendo a tus papás. ¿Qué buscas exactamente?
-**Maite:** Tengo unas postales que ellos guardaron de este viaje. Quiero encontrar el lugar exacto de cada una.
-**Wara:** Entonces sígueme. Afuera del pueblo hay algo que tienes que ver primero.
+**Maite:** Tengo unas postales que ellos guardaron de este viaje. Mira, esta es la de aquí.
+**Wara:** Mmm... ese vapor que sale de la tierra, con los cerros atrás... Son los géiseres. Mi abuelo me llevaba cuando era chica.
+**Wara:** Yo sé dónde es. Ven, te llevo.
+
+*(Fundido a negro. Wara y Maite aparecen fuera del pueblo, en PuntoTransportar, y el pueblo de Isluga se esconde.)*
+
+> Objetivo: Habla con Wara.
+
+**Wara:** Desde aquí seguimos a pie. Sígueme, que en el camino hay cosas que quiero mostrarte.
 
 > Objetivo: Sigue a Wara.
 
-### Paso 6 · La queñoa
+### Paso 6 · La queñoa (a mitad de camino)
 
 **Wara:** Esta es una queñoa. Crece donde casi ningún otro árbol puede: es el árbol que vive a mayor altura en el mundo.
 **Wara:** Fíjate en su corteza, se suelta en capas finitas como papel. Así se protege del frío. Sácale una foto, para que no se te olvide.
@@ -80,11 +89,21 @@ Borrador para revisar. Cuando esté aprobado, estos textos se cargan tal cual en
 > Objetivo: Fotografía la queñoa.
 > Recordatorio: **Wara:** Apúntale con el teléfono hasta que se registre.
 
-### Paso 7 · La postal
+> Objetivo: Vuelve con Wara y háblale.
 
-**Maite:** Wara, mira. Esta es la postal de aquí.
-**Wara:** Mmm... ese vapor que sale de la tierra, con los cerros atrás... Son los géiseres. Mi abuelo me llevaba cuando era chica.
-**Wara:** No queda lejos, te llevo. En el camino hay más queñoas y vicuñas: si quieres, sácales fotos.
+**Wara:** ¡Bien! Sigamos, que ya no queda tanto.
+
+### Paso 7 · Las vicuñas
+
+**Wara:** Mira, allá. Son vicuñas, como las del chaku, pero estas andan libres.
+**Wara:** Acércate despacio, que se espantan fácil. Escanea una con tu teléfono.
+
+> Objetivo: Escanea una vicuña con tu teléfono.
+> Recordatorio: **Wara:** Apúntale a una vicuña con el teléfono hasta que se registre.
+
+> Objetivo: Vuelve con Wara y háblale.
+
+**Wara:** Son lindas, ¿cierto? Vamos, los géiseres están ahí nomás.
 
 > Objetivo: Sigue a Wara hasta el lugar de la postal.
 

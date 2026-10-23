@@ -21,6 +21,12 @@ public class AnimalScanner : MonoBehaviour
     [SerializeField] private TMP_Text standardNameText;
     [SerializeField] private TMP_Text descriptionText;
 
+    /// <summary>
+    /// Se dispara cada vez que se abre la ficha de algo con el teléfono, aunque ya estuviera
+    /// registrado. Lo usa el flujo de la zona para los pasos de "sácale una foto".
+    /// </summary>
+    public static event System.Action<Scannable> Fotografiado;
+
     private Camera cam;
     private Scannable currentTarget;
     private float scanTimer;
@@ -37,7 +43,7 @@ public class AnimalScanner : MonoBehaviour
 
     private void Update()
     {
-        if (!ThirdPersonCameraController.IsFirstPerson || DialogueManager.IsOpen)
+        if (!UIManager.EstaAbierta(CapaUI.Telefono) || UIManager.BloqueaAcciones)
         {
             ResetScan();
             return;
@@ -124,6 +130,8 @@ public class AnimalScanner : MonoBehaviour
         if (standardNameText != null) standardNameText.text = target.DisplayName;
         if (descriptionText != null) descriptionText.text = target.Description;
         if (descriptionPanel != null) descriptionPanel.SetActive(true);
+
+        Fotografiado?.Invoke(target);
     }
 
     private void ClosePanel()

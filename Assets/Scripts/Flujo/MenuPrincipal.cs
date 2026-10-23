@@ -24,8 +24,7 @@ public class MenuPrincipal : MonoBehaviour
 
     private void Awake()
     {
-        Cursor.lockState = CursorLockMode.None;
-        Cursor.visible = true;
+        UIManager.Abrir(CapaUI.Menu, this);
 
         if (jugarButton != null) jugarButton.onClick.AddListener(Jugar);
         if (salirButton != null) salirButton.onClick.AddListener(Salir);

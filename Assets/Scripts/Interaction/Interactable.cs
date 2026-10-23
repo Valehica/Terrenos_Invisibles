@@ -14,4 +14,10 @@ public class Interactable : MonoBehaviour
     public Transform InteractionPoint => transform;
     public bool StartsMinigame => startsMinigame;
     public MinigameBase Minigame => minigame;
+
+    /// <summary>
+    /// Si está asignado, al hablarle se llama esto en vez de mostrar el texto fijo: el flujo de
+    /// la zona decide qué conversación corresponde según el paso. Devuelve true si se encargó.
+    /// </summary>
+    public System.Func<bool> AlHablar { get; set; }
 }

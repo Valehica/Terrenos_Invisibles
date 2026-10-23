@@ -63,6 +63,7 @@ public class IntroSequenceController : MonoBehaviour
     private void Awake()
     {
         IsPlaying = true;
+        UIManager.Abrir(CapaUI.Intro, this);
         if (introPanel != null) introPanel.SetActive(true);
         if (continuePrompt != null) continuePrompt.SetActive(false);
     }
@@ -168,11 +169,13 @@ public class IntroSequenceController : MonoBehaviour
         }
 
         IsPlaying = false;
+        UIManager.Cerrar(CapaUI.Intro);
         if (introPanel != null) introPanel.SetActive(false);
     }
 
     private void OnDestroy()
     {
         IsPlaying = false;
+        UIManager.Cerrar(CapaUI.Intro, this);
     }
 }

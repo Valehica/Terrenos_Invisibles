@@ -240,6 +240,7 @@ public class CanoaMinigameManager : MinigameBase
     {
         state = State.Transition;
         IsRunning = true;
+        UIManager.Abrir(CapaUI.Minijuego, this);
         uiRoot.SetActive(true);
         hud.SetActive(false);
         panel.SetActive(false);
@@ -266,9 +267,6 @@ public class CanoaMinigameManager : MinigameBase
 
         ShowPanel(briefingBody);
         hud.SetActive(false);
-
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
 
         yield return Fade(1f, 0f, 0.8f);
         state = State.Briefing;
@@ -584,13 +582,11 @@ public class CanoaMinigameManager : MinigameBase
         if (!completed) PlaceCanoeAtStart();
         canoe.SetSunk(false);
 
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
-
         yield return Fade(1f, 0f, 0.8f);
 
         uiRoot.SetActive(false);
         IsRunning = false;
+        UIManager.Cerrar(CapaUI.Minijuego);
         state = State.Idle;
     }
 
@@ -948,6 +944,7 @@ public class CanoaMinigameManager : MinigameBase
     private void OnDisable()
     {
         IsRunning = false;
+        UIManager.Cerrar(CapaUI.Minijuego, this);
     }
 
     /// <summary>

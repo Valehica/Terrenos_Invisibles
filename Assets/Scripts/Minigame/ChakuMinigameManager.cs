@@ -34,6 +34,7 @@ public class ChakuMinigameManager : MinigameBase
     [SerializeField] private TMP_Text collectedCounterText;
 
     private bool isRunning;
+    private bool won;
     private int collectedCount;
     private readonly List<VicunaHerdMember> allMembers = new List<VicunaHerdMember>();
     private readonly List<Vector3> memberSpawnPositions = new List<Vector3>();
@@ -55,6 +56,8 @@ public class ChakuMinigameManager : MinigameBase
     {
         if (isRunning) return;
         isRunning = true;
+        won = false;
+        UIManager.Abrir(CapaUI.Minijuego, this);
 
         if (explorationPlayer != null) explorationPlayer.SetActive(false);
         if (explorationCamera != null) explorationCamera.gameObject.SetActive(false);
@@ -175,17 +178,25 @@ public class ChakuMinigameManager : MinigameBase
     private void EndMinigame(bool won)
     {
         isRunning = false;
+        this.won = won;
         if (chainController != null) chainController.SetInputEnabled(false);
 
         if (instructionsPanel != null) instructionsPanel.SetActive(false);
         if (resultPanel != null) resultPanel.SetActive(true);
         if (resultText != null)
             resultText.text = won ? "¡Recolectaste todas las vicuñas!" : "Minijuego terminado.";
+        UIManager.Abrir(CapaUI.ResultadoMinijuego, this);
     }
 
     public void ReturnToExploration()
     {
+        bool estabaJugando = minigameRoot == null || minigameRoot.activeSelf;
         isRunning = false;
+
+        // Los paneles viven en Canvas/ChakuUI, fuera de minigameRoot: si no se esconden acá el
+        // resultado queda en pantalla, y su Enter seguiría llamando a este método.
+        if (instructionsPanel != null) instructionsPanel.SetActive(false);
+        if (resultPanel != null) resultPanel.SetActive(false);
 
         if (minigameRoot != null) minigameRoot.SetActive(false);
         if (topDownCamera != null) topDownCamera.gameObject.SetActive(false);
@@ -193,5 +204,13 @@ public class ChakuMinigameManager : MinigameBase
 
         if (explorationPlayer != null) explorationPlayer.SetActive(true);
         if (explorationCamera != null) explorationCamera.gameObject.SetActive(true);
+
+        UIManager.Cerrar(CapaUI.ResultadoMinijuego);
+        UIManager.Cerrar(CapaUI.Minijuego);
+
+        // Esc a mitad de ronda cuenta como abandonado; volver desde el resultado, como completado.
+        bool completado = won;
+        won = false;
+        if (estabaJugando) AvisarTerminado(completado);
     }
 }

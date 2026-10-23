@@ -42,7 +42,6 @@ public class ThirdPersonCameraController : MonoBehaviour
 
     private float yaw;
     private float pitch;
-    private bool cursorLocked;
     private bool isFirstPerson;
     private Renderer[] playerRenderers;
     private bool isDialogueView;
@@ -63,7 +62,7 @@ private void Start()
         yaw = transform.eulerAngles.y;
         pitch = startPitch;
         collisionMask = LimiteJugable.MascaraSin(collisionMask); // las paredes invisibles no empujan la camara
-        SetCursorLocked(true);
+        UIManager.Cerrar(CapaUI.CursorSuelto);
 
         cam = GetComponent<Camera>();
         if (cam != null)
@@ -79,15 +78,17 @@ private void Start()
 
 private void Update()
     {
-        if (DialogueManager.IsOpen || IntroSequenceController.IsPlaying) return;
+        if (Keyboard.current != null && !UIManager.BloqueaAcciones)
+        {
+            if (Keyboard.current.escapeKey.wasPressedThisFrame)
+            {
+                if (UIManager.EstaAbierta(CapaUI.CursorSuelto)) UIManager.Cerrar(CapaUI.CursorSuelto);
+                else UIManager.Abrir(CapaUI.CursorSuelto, this);
+            }
 
-        if (Keyboard.current == null) return;
-
-        if (Keyboard.current.escapeKey.wasPressedThisFrame)
-            SetCursorLocked(!cursorLocked);
-
-        if (Keyboard.current.eKey.wasPressedThisFrame)
-            SetFirstPerson(!isFirstPerson);
+            if (Keyboard.current.eKey.wasPressedThisFrame)
+                SetFirstPerson(!isFirstPerson);
+        }
 
         if (isFirstPerson && cam != null)
         {
@@ -116,7 +117,7 @@ private void LateUpdate()
         float pitchMin = isFirstPerson ? firstPersonMinPitch : minPitch;
         float pitchMax = isFirstPerson ? firstPersonMaxPitch : maxPitch;
 
-        if (cursorLocked && Mouse.current != null)
+        if (!UIManager.CursorLibre && Mouse.current != null)
         {
             Vector2 lookDelta = Mouse.current.delta.ReadValue();
             float sensitivity = mouseSensitivity;
@@ -144,6 +145,8 @@ private void SetFirstPerson(bool enabled)
     {
         isFirstPerson = enabled;
         IsFirstPerson = enabled;
+        if (enabled) UIManager.Abrir(CapaUI.Telefono, this);
+        else UIManager.Cerrar(CapaUI.Telefono);
 
         if (cam != null)
             cam.fieldOfView = defaultFov;
@@ -168,6 +171,13 @@ public void EnterDialogueView(Transform npc)
 
         isDialogueView = true;
         dialogueTarget = npc;
+    }
+
+    /// <summary>Guarda el teléfono si estaba en la mano.</summary>
+    public void ExitPhone()
+    {
+        if (isFirstPerson)
+            SetFirstPerson(false);
     }
 
     public void ExitDialogueView()
@@ -215,12 +225,5 @@ private float ResolveCollisionDistance(Vector3 pivot, Quaternion rotation)
         }
 
         return Mathf.Clamp(closest, minDistance, distance);
-    }
-
-    private void SetCursorLocked(bool locked)
-    {
-        cursorLocked = locked;
-        Cursor.lockState = locked ? CursorLockMode.Locked : CursorLockMode.None;
-        Cursor.visible = !locked;
     }
 }

@@ -183,6 +183,7 @@ public class LugaMinigameManager : MinigameBase
         timeLeft = roundSeconds;
         state = State.Briefing;
         IsRunning = true;
+        UIManager.Abrir(CapaUI.Minijuego, this);
 
         // La marea normal del mar tambien escribe su altura cada frame: sin
         // apagarla, las dos se pisan y gana la que corra ultima.
@@ -666,8 +667,7 @@ public class LugaMinigameManager : MinigameBase
             resultText.text = (won ? "¡Recolección lograda!\n\n" : "Jornada incompleta.\n\n") + message + stunNote;
         }
 
-        Cursor.lockState = CursorLockMode.None;
-        Cursor.visible = true;
+        UIManager.Abrir(CapaUI.ResultadoMinijuego, this);
     }
 
     public void ReturnToExploration()
@@ -696,8 +696,8 @@ public class LugaMinigameManager : MinigameBase
 
         SetUIVisible(false);
 
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
+        UIManager.Cerrar(CapaUI.ResultadoMinijuego);
+        UIManager.Cerrar(CapaUI.Minijuego);
     }
 
     private void SetUIVisible(bool visible)
@@ -716,5 +716,7 @@ public class LugaMinigameManager : MinigameBase
     private void OnDisable()
     {
         IsRunning = false;
+        UIManager.Cerrar(CapaUI.ResultadoMinijuego, this);
+        UIManager.Cerrar(CapaUI.Minijuego, this);
     }
 }

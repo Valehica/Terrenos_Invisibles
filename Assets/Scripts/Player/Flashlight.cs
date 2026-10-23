@@ -22,11 +22,12 @@ public class Flashlight : MonoBehaviour
 
     private void Update()
     {
-        if (!handleInput || DialogueManager.IsOpen || PlayerStun.IsStunned) return;
+        if (!handleInput || PlayerStun.IsStunned) return;
         if (Mouse.current == null) return;
 
-        // Solo con el cursor bloqueado: con un panel abierto el click es para sus botones.
-        if (Cursor.lockState != CursorLockMode.Locked) return;
+        // Con el cursor libre el click es para los botones de un panel; con el jugador frenado
+        // (una conversación) es para avanzar el texto. En la luga se camina, y la linterna sirve.
+        if (UIManager.CursorLibre || UIManager.BloqueaMovimiento) return;
 
         if (Mouse.current.leftButton.wasPressedThisFrame) Toggle();
     }

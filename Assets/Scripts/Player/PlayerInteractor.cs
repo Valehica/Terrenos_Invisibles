@@ -11,7 +11,7 @@ public class PlayerInteractor : MonoBehaviour
 
     private void Update()
     {
-        if (DialogueManager.IsOpen || LugaMinigameManager.IsRunning || CanoaMinigameManager.IsRunning)
+        if (UIManager.BloqueaAcciones)
         {
             SetPromptVisible(false);
             return;
@@ -44,7 +44,8 @@ public class PlayerInteractor : MonoBehaviour
         foreach (Collider hit in hits)
         {
             Interactable interactable = hit.GetComponentInParent<Interactable>();
-            if (interactable == null) continue;
+            // Apagado = no se le puede hablar por ahora (por ejemplo, un guía mientras camina).
+            if (interactable == null || !interactable.isActiveAndEnabled) continue;
 
             float distanceSqr = (interactable.transform.position - transform.position).sqrMagnitude;
             if (distanceSqr < nearestDistanceSqr)

@@ -57,7 +57,7 @@ private void Awake()
 
 private void Update()
     {
-        if (DialogueManager.IsOpen || IntroSequenceController.IsPlaying || PlayerStun.IsStunned)
+        if (UIManager.BloqueaMovimiento || PlayerStun.IsStunned)
         {
             UpdateAnimator(Vector2.zero, false, false, false);
             return;
