@@ -38,6 +38,12 @@ public class PostalesUI : MonoBehaviour
     [SerializeField] private Vector2 posicionSeleccionada = new Vector2(-480f, 10f);
     [SerializeField] private float escalaSeleccionada = 1.55f;
 
+    [Header("Barra del punto de la postal (a la derecha, a la altura del borde de arriba)")]
+    [SerializeField] private Vector2 tamanoBarra = new Vector2(520f, 8f);
+    [Tooltip("Parte de la imagen que es margen transparente arriba del marco blanco.")]
+    [SerializeField] private float margenArribaPostal = 0.05f;
+    [SerializeField] private float segundosBarraCompleta = 2f;
+
     [Header("Aspecto")]
     [SerializeField] private float suavizado = 12f;
     [SerializeField] private Color colorFondo = new Color(0f, 0f, 0f, 0.45f);
@@ -51,6 +57,7 @@ public class PostalesUI : MonoBehaviour
         public RectTransform imagen;
         public CanvasGroup grupo;
         public Image golpe;
+        public Sprite sprite;
         public Vector2 posAbanico;
         public float giroAbanico;
         public float distanciaCentro;
@@ -64,11 +71,38 @@ public class PostalesUI : MonoBehaviour
     private TMP_Text ayuda;
     private ThirdPersonCameraController camara;
 
+    private CanvasGroup barraGrupo;
+    private RectTransform barraRelleno;
+    private Object duenoBarra;
+    private bool barraVisible;
+    private float ocultarBarraEn = -1f;
+
     private bool abierto;
     private int hover = -1;
     private int seleccionada = -1;
 
     public bool Abierto => abierto;
+
+    /// <summary>La postal elegida, la que está a la izquierda con el juego andando; null si no hay.</summary>
+    public Sprite PostalEnMano => abierto && seleccionada >= 0 ? cartas[seleccionada].sprite : null;
+
+    /// <summary>
+    /// Llena la barra de la derecha hasta <paramref name="valor"/> (0 a 1); un valor negativo la
+    /// esconde. Completada, queda llena unos segundos y se va sola. La usa <see cref="PuntoPostal"/>.
+    /// </summary>
+    public void MostrarProgreso(Object dueno, float valor, bool completado = false)
+    {
+        if (valor < 0f)
+        {
+            if (duenoBarra == dueno) barraVisible = false;
+            return;
+        }
+
+        duenoBarra = dueno;
+        barraVisible = true;
+        ocultarBarraEn = completado ? Time.time + segundosBarraCompleta : -1f;
+        barraRelleno.anchorMax = new Vector2(Mathf.Clamp01(valor), 1f);
+    }
 
     private void Awake()
     {
@@ -195,6 +229,13 @@ public class PostalesUI : MonoBehaviour
         cf.a = Mathf.Lerp(cf.a, seleccionada >= 0 ? 0f : colorFondo.a, k);
         fondo.color = cf;
 
+        if (ocultarBarraEn >= 0f && Time.time >= ocultarBarraEn)
+        {
+            barraVisible = false;
+            ocultarBarraEn = -1f;
+        }
+        barraGrupo.alpha = Mathf.Lerp(barraGrupo.alpha, barraVisible && seleccionada >= 0 ? 1f : 0f, k);
+
         for (int i = 0; i < cartas.Count; i++)
         {
             Carta c = cartas[i];
@@ -288,8 +329,33 @@ public class PostalesUI : MonoBehaviour
             cartas.Add(CrearCarta(sprite, i, n));
         }
 
+        CrearBarra();
         ayuda = CrearAyuda();
         Reordenar();
+    }
+
+    // Del otro lado de la pantalla que la postal elegida, a la altura de su marco de arriba.
+    private void CrearBarra()
+    {
+        var barra = Hijo("BarraPunto", raiz.transform, typeof(Image), typeof(CanvasGroup));
+        float altoElegida = altoPostal * escalaSeleccionada;
+        float arribaMarco = posicionSeleccionada.y + altoElegida * (0.5f - margenArribaPostal);
+        barra.sizeDelta = tamanoBarra;
+        barra.anchoredPosition = new Vector2(-posicionSeleccionada.x, arribaMarco - tamanoBarra.y * 0.5f);
+        var fondoBarra = barra.GetComponent<Image>();
+        fondoBarra.color = new Color(1f, 1f, 1f, 0.25f);
+        fondoBarra.raycastTarget = false;
+        barraGrupo = barra.GetComponent<CanvasGroup>();
+        barraGrupo.alpha = 0f;
+        barraGrupo.blocksRaycasts = false;
+
+        barraRelleno = Hijo("Relleno", barra, typeof(Image));
+        barraRelleno.anchorMin = Vector2.zero;
+        barraRelleno.anchorMax = new Vector2(0f, 1f);
+        barraRelleno.offsetMin = barraRelleno.offsetMax = Vector2.zero;
+        var relleno = barraRelleno.GetComponent<Image>();
+        relleno.color = Color.white;
+        relleno.raycastTarget = false;
     }
 
     private Carta CrearCarta(Sprite sprite, int i, int n)
@@ -315,6 +381,7 @@ public class PostalesUI : MonoBehaviour
             imagen = imagen,
             grupo = zona.GetComponent<CanvasGroup>(),
             golpe = golpe,
+            sprite = sprite,
             posAbanico = new Vector2(t * separacion, alturaAbanico - Mathf.Abs(t) * caidaBordes),
             giroAbanico = -t * giroBordes,
             distanciaCentro = Mathf.Abs(t),

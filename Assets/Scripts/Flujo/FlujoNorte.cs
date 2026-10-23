@@ -3,6 +3,7 @@ using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 /// <summary>
@@ -58,7 +59,7 @@ public class FlujoNorte : MonoBehaviour
     [Tooltip("Segundos en negro, con Wara y Maite ya en el destino.")]
     [SerializeField] private float esperaEnNegro = 0.6f;
 
-    [Header("Para probar")]
+    [Header("Para probar (M salta al lugar de la postal, solo en el editor)")]
     [Tooltip("Paso con el que parte la escena. Wara y Maite se ubican donde corresponde.")]
     [SerializeField] private Paso empezarEn = Paso.Llegada;
 
@@ -222,12 +223,45 @@ public class FlujoNorte : MonoBehaviour
 
     private void Update()
     {
+        // Solo en el editor y en builds de desarrollo.
+        if (Debug.isDebugBuild && Keyboard.current != null && Keyboard.current.mKey.wasPressedThisFrame)
+        {
+            SaltarALaPostal();
+            return;
+        }
+
         if (!empezado)
         {
             if (Time.time - inicio < esperaInicial) return;
             empezado = true;
             Empezar();
         }
+    }
+
+    /// <summary>
+    /// Para probar (M): corta lo que esté pasando (diálogo, caminata, chaku, viaje) y deja a Wara
+    /// en <see cref="puntoPostalNpc"/> con Maite al lado, en el paso <see cref="Paso.EnLaPostal"/>.
+    /// </summary>
+    private void SaltarALaPostal()
+    {
+        if (chakuEnCurso && chaku is ChakuMinigameManager chakuNorte) chakuNorte.ReturnToExploration();
+        chakuEnCurso = false;
+
+        StopAllCoroutines(); // el viaje, si estaba a mitad del fundido
+        if (fundido != null) fundido.gameObject.SetActive(false);
+        var control = jugador != null ? jugador.GetComponent<PlayerController>() : null;
+        if (control != null) control.enabled = true;
+
+        if (DialogueManager.Instance != null) DialogueManager.Instance.CloseDialogue();
+        MostrarPostal(false);
+        pendiente = null;
+        alTerminarPendiente = null;
+        pendienteConPostal = false;
+
+        empezado = true;
+        UbicarPara(Paso.EnLaPostal);
+        Entrar(Paso.EnLaPostal);
+        Debug.Log("FlujoNorte: salto de prueba (M) al lugar de la postal.");
     }
 
     private void DecirPendiente()

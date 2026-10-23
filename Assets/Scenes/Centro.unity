@@ -3359,43 +3359,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 611317585}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!84 &613533911
-RenderTexture:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_Name: 
-  m_ImageContentsHash:
-    serializedVersion: 2
-    Hash: 00000000000000000000000000000000
-  m_IsAlphaChannelOptional: 0
-  serializedVersion: 6
-  m_Width: 128
-  m_Height: 128
-  m_AntiAliasing: 1
-  m_MipCount: -1
-  m_DepthStencilFormat: 94
-  m_ColorFormat: 48
-  m_MipMap: 1
-  m_GenerateMips: 1
-  m_SRGB: 0
-  m_UseDynamicScale: 0
-  m_UseDynamicScaleExplicit: 0
-  m_BindMS: 0
-  m_EnableCompatibleFormat: 1
-  m_EnableRandomWrite: 0
-  m_TextureSettings:
-    serializedVersion: 2
-    m_FilterMode: 1
-    m_Aniso: 1
-    m_MipBias: 0
-    m_WrapU: 1
-    m_WrapV: 1
-    m_WrapW: 1
-  m_Dimension: 2
-  m_VolumeDepth: 1
-  m_ShadowSamplingMode: 2
 --- !u!1 &621357748
 GameObject:
   m_ObjectHideFlags: 0
@@ -7457,6 +7420,8 @@ MonoBehaviour:
   exitButton: {fileID: 701923678}
   acceptButton: {fileID: 320428911}
   cameraController: {fileID: 330585548}
+  letrasPorSegundo: 40
+  colorNombre: {r: 1, g: 0.82, b: 0.5, a: 1}
 --- !u!4 &1399944326
 Transform:
   m_ObjectHideFlags: 0
@@ -8469,43 +8434,6 @@ Transform:
   - {fileID: 687722547}
   m_Father: {fileID: 2065456112}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!84 &1593483589
-RenderTexture:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_Name: 
-  m_ImageContentsHash:
-    serializedVersion: 2
-    Hash: 00000000000000000000000000000000
-  m_IsAlphaChannelOptional: 0
-  serializedVersion: 6
-  m_Width: 128
-  m_Height: 128
-  m_AntiAliasing: 1
-  m_MipCount: -1
-  m_DepthStencilFormat: 94
-  m_ColorFormat: 48
-  m_MipMap: 1
-  m_GenerateMips: 1
-  m_SRGB: 0
-  m_UseDynamicScale: 0
-  m_UseDynamicScaleExplicit: 0
-  m_BindMS: 0
-  m_EnableCompatibleFormat: 1
-  m_EnableRandomWrite: 0
-  m_TextureSettings:
-    serializedVersion: 2
-    m_FilterMode: 1
-    m_Aniso: 1
-    m_MipBias: 0
-    m_WrapU: 1
-    m_WrapV: 1
-    m_WrapW: 1
-  m_Dimension: 2
-  m_VolumeDepth: 1
-  m_ShadowSamplingMode: 2
 --- !u!1001 &1595020503
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -9302,6 +9230,66 @@ SkinnedMeshRenderer:
     m_Center: {x: 0.14684103, y: 0.452232, z: 0.11002569}
     m_Extent: {x: 0.24187167, y: 0.15808117, z: 0.18678923}
   m_DirtyAABB: 0
+--- !u!1 &1615415184
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1615415186}
+  - component: {fileID: 1615415185}
+  m_Layer: 0
+  m_Name: Postales
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1615415185
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1615415184}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f837a33b0336a0047bf05ed3a2982766, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  postales:
+  - {fileID: 21300000, guid: 65a7a4d920fec7542889c017fc98aa49, type: 3}
+  - {fileID: 21300000, guid: 762b21b123310e3449f0df0c83c808cc, type: 3}
+  - {fileID: 21300000, guid: f84ef4cd27a78b842886b0a52dc328ee, type: 3}
+  altoPostal: 560
+  separacion: 340
+  alturaAbanico: 20
+  caidaBordes: 50
+  giroBordes: 12
+  escalaHover: 1.12
+  subidaHover: 45
+  posicionSeleccionada: {x: -480, y: 10}
+  escalaSeleccionada: 1.55
+  suavizado: 12
+  colorFondo: {r: 0, g: 0, b: 0, a: 0.45}
+  ordenCanvas: 60
+--- !u!4 &1615415186
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1615415184}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1651700359
 GameObject:
   m_ObjectHideFlags: 0
@@ -11552,3 +11540,4 @@ SceneRoots:
   - {fileID: 90759521}
   - {fileID: 741037791}
   - {fileID: 1122026473}
+  - {fileID: 1615415186}
